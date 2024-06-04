@@ -1,30 +1,64 @@
-# React + TypeScript + Vite
+# CumbaGym
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+CumbaGym is a web application designed to facilitate the interaction between gym coaches and their clients. It allows coaches to create and manage routines, track client measurements, and assign routines to clients. Clients, on the other hand, can view their assigned routines and personal information.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **User Management**: Store personal information about clients, including their national ID, name, last name, age, goal, start date, and gender.
+- **Measurement Tracking**: Record body measurements for each client, such as left arm, right arm, upper waist, lower waist, left thigh, and right thigh, along with the measurement date.
+- **Routine Creation**: Coaches can create routines with a name and add exercise sets to each routine, specifying the machine name, set number, weight, and repetitions.
+- **Routine Assignment**: Establish a many-to-many relationship between users and routines, allowing a user to have multiple routines and a routine to be assigned to multiple users.
 
-## Expanding the ESLint configuration
+## Database Structure
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+The application uses a relational database to store and manage data. The database consists of the following tables:
 
-- Configure the top-level `parserOptions` property like this:
+- **Users**: Stores personal information about clients.
+- **Measurements**: Stores body measurements of clients recorded by the coach.
+- **Routines**: Stores the routines created by the coach.
+- **ExerciseSets**: Stores the exercise sets within each routine.
+- **UserRoutines**: A junction table to establish the many-to-many relationship between users and routines.
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+For more details on the database structure and table creation, refer to the [Database Description](#database-description) section.
+
+## Getting Started
+
+To run the CumbaGym application locally, follow these steps:
+
+1. Clone the repository:
+
+```
+git clone https://github.com/your-username/cumbagym.git
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+2. Navigate to the project directory:
+
+```
+cd cumbagym
+```
+
+3. Install dependencies:
+
+```
+pnpm install
+```
+
+4. Start the development server:
+
+```
+pnpm run dev
+```
+
+The application will be available at `http://localhost:3000`.
+
+## Database Description
+
+The database structure and table creation details can be found in the [BD.md](./BD.md) file.
+
+## Contributing
+
+Contributions are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
