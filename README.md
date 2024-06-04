@@ -9,18 +9,6 @@ CumbaGym is a web application designed to facilitate the interaction between gym
 - **Routine Creation**: Coaches can create routines with a name and add exercise sets to each routine, specifying the machine name, set number, weight, and repetitions.
 - **Routine Assignment**: Establish a many-to-many relationship between users and routines, allowing a user to have multiple routines and a routine to be assigned to multiple users.
 
-## Database Structure
-
-The application uses a relational database to store and manage data. The database consists of the following tables:
-
-- **Users**: Stores personal information about clients.
-- **Measurements**: Stores body measurements of clients recorded by the coach.
-- **Routines**: Stores the routines created by the coach.
-- **ExerciseSets**: Stores the exercise sets within each routine.
-- **UserRoutines**: A junction table to establish the many-to-many relationship between users and routines.
-
-For more details on the database structure and table creation, refer to the [Database Description](#database-description) section.
-
 ## Getting Started
 
 To run the CumbaGym application locally, follow these steps:
