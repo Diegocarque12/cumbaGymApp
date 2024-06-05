@@ -1,35 +1,40 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import { User } from "../interfaces/types";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  "https://tgbwzhkwhrmmtczxrsgv.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRnYnd6aGt3aHJtbXRjenhyc2d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTc1NTIzODMsImV4cCI6MjAzMzEyODM4M30.LKEZvOtD-EjSoltmrTna-t6zE1G52semmUSXoy3pdI8"
+);
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [users, setUsers] = useState<User[]>([]);
+
+  useEffect(() => {
+    getUsers();
+  }, []);
+
+  async function getUsers() {
+    const { data } = await supabase.from("users").select();
+    if (data) {
+      setUsers(data);
+    }
+  }
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <ul>
+        {users.map((user) => (
+          <>
+            <li key={user.name}>Name: {user.name}</li>
+            <li>lastname: {user.lastName}</li>
+            <li>age: {user.age}</li>
+            <li>goal: {user.goal}</li>
+          </>
+        ))}
+      </ul>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
