@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { User } from "../interfaces/types";
-import "./App.css";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
