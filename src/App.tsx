@@ -25,7 +25,12 @@ function App() {
     <>
       <ul>
         {users.map((user) => (
-          <li key={user.name}>{user.name}</li>
+          <>
+            <li key={user.name}>Name: {user.name}</li>
+            <li>lastname: {user.lastName}</li>
+            <li>age: {user.age}</li>
+            <li>goal: {user.goal}</li>
+          </>
         ))}
       </ul>
     </>
