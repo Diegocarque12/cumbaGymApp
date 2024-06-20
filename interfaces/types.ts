@@ -41,6 +41,16 @@ export interface Exercise {
     instructions: string;
     video_url: string;
     image_url: string;
-    created_at: string;
-    updated_at: string;
+}
+
+export interface Measurement {
+  id: number;
+    userid: number;
+    leftArm: number;
+    rightArm: number;
+    upperWaist: number;
+    lowerWaist: number;
+    leftThigh: number;
+    rightThigh: number;
+    measurementDate: Date;
 }
