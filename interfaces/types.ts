@@ -12,6 +12,7 @@ export interface User {
 export interface Routine {
   id: number;
   name: string;
+  description: string;
 }
 
 export interface UserRoutine {
@@ -23,8 +24,23 @@ export interface UserRoutine {
 export interface ExerciseSet {
   id: number;
   routineId: number;
-  machinename: string;
+  exerciseId: number;
   setnumber: number;
   weight: number;
   repetitions: number;
+}
+
+export interface Exercise {
+    id: number;
+    name: string;
+    description: string;
+    category: string;
+    target_muscle: string;
+    equipment: string;
+    difficulty: string;
+    instructions: string;
+    video_url: string;
+    image_url: string;
+    created_at: string;
+    updated_at: string;
 }

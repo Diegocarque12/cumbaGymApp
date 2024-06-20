@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import supabase from "../../utils/supabaseClient";
-import type { ExerciseSet, Routine } from "../../../interfaces/types";
+import type { Exercise, ExerciseSet, Routine } from "../../../interfaces/types";
 
 const Routine = () => {
   const { routineId } = useParams<{ routineId: string }>();
   const routineid = parseInt(routineId || "0");
   const [routine, setRoutine] = useState<Routine | null>(null);
   const [exerciseSets, setExerciseSets] = useState<ExerciseSet[]>([]);
+  const [exercises, setExercises] = useState<Exercise[]>([]);
   const [newExerciseSet, setNewExerciseSet] = useState<ExerciseSet>({
     id: 0,
     routineId: routineid,
-    machinename: "",
+    exerciseId: 0,
     setnumber: 0,
     weight: 0,
     repetitions: 0,
@@ -22,7 +23,8 @@ const Routine = () => {
 
   useEffect(() => {
     fetchRoutine();
-    fetchSets();
+    fetchExerciseSets();
+    fetchExercises();
   }, [routineid]);
 
   const fetchRoutine = async () => {
@@ -43,11 +45,11 @@ const Routine = () => {
     }
   };
 
-  const fetchSets = async () => {
+  const fetchExerciseSets = async () => {
     try {
       const { data, error } = await supabase
         .from("exercisesets")
-        .select("*")
+        .select("*, exercises(name)")
         .eq("routineid", routineid);
       if (error) {
         throw new Error(error.message);
@@ -59,30 +61,51 @@ const Routine = () => {
       setIsLoading(false);
     }
   };
-  
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+  const fetchExercises = async () => {
+    try {
+      const { data, error } = await supabase.from("exercises").select("*");
+      if (error) {
+        throw new Error(error.message);
+      }
+      setExercises(data as Exercise[]);
+    } catch (err) {
+      setError("Error al obtener los ejercicios");
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setNewExerciseSet((prevSet) => ({
       ...prevSet,
-      [name]: value,
+      [name]: name === "exerciseId" ? parseInt(value) : value,
     }));
   };
 
   const handleCreateExerciseSet = async () => {
     try {
-      const { data, error } = await supabase.from("exercisesets").insert([newExerciseSet]);
+      const { data, error } = await supabase.from("exercisesets").insert([
+        {
+          routineid: newExerciseSet.routineId,
+          exerciseId: newExerciseSet.exerciseId,
+          setnumber: newExerciseSet.setnumber,
+          weight: newExerciseSet.weight,
+          repetitions: newExerciseSet.repetitions,
+        },
+      ]);
       if (error) {
         throw new Error(error.message);
       }
-      setExerciseSets((prevSets) => data ? [...prevSets, ...data as ExerciseSet[]] : prevSets);
+      setExerciseSets((prevSets) => [...prevSets, ...(data ?? [])]);
       setNewExerciseSet({
         id: 0,
-        routineId: 0,
-        machinename: "",
+        routineId: routineid,
+        exerciseId: 0,
         setnumber: 0,
         weight: 0,
         repetitions: 0,
       });
+      fetchExerciseSets();
     } catch (err) {
       setError("Error al crear el set de ejercicio");
     }
@@ -108,7 +131,7 @@ const Routine = () => {
       setNewExerciseSet({
         id: 0,
         routineId: 0,
-        machinename: "",
+        exerciseId: 0,
         setnumber: 0,
         weight: 0,
         repetitions: 0,
@@ -140,80 +163,109 @@ const Routine = () => {
   }
 
   return (
-    <div>
-     <h1>Rutina: {routine?.name}</h1>
-      <table>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 className="text-3xl font-bold mb-8">Rutina: {routine?.name}</h1>
+      <table className="w-full border-collapse">
         <thead>
-          <tr>
-            <th>Rutina</th>
-            <th>Ejercicio</th>
-            <th>Set</th>
-            <th>Peso</th>
-            <th>Repeticiones</th>
-            <th>Acciones</th>
+          <tr className="bg-gray-200">
+            <th className="px-4 py-2">Ejercicio</th>
+            <th className="px-4 py-2">Set</th>
+            <th className="px-4 py-2">Peso</th>
+            <th className="px-4 py-2">Repeticiones</th>
+            <th className="px-4 py-2">Acciones</th>
           </tr>
         </thead>
         <tbody>
           {exerciseSets.map((set) => (
-            <tr key={set.id}>
-              <td>
+            <tr key={set.id} className="border-t">
+              <td className="px-4 py-2">
                 {editingExerciseSetId === set.id ? (
-                  <input
-                    type="text"
-                    name="machinename"
-                    value={newExerciseSet.machinename}
+                  <select
+                    name="exerciseId"
+                    value={newExerciseSet.id}
                     onChange={handleInputChange}
-                  />
+                    className="w-full px-2 py-1 border border-gray-300 rounded"
+                  >
+                    <option value="">Seleccionar ejercicio</option>
+                    {exercises.map((exercise) => (
+                      <option key={exercise.id} value={exercise.id}>
+                        {exercise.name}
+                      </option>
+                    ))}
+                  </select>
                 ) : (
-                  set.machinename
+                  set.exerciseId && exercises.find((exercise) => exercise.id === set.exerciseId)?.name
                 )}
               </td>
-              <td>
+              <td className="px-4 py-2 text-center">
                 {editingExerciseSetId === set.id ? (
                   <input
                     type="number"
                     name="setnumber"
                     value={newExerciseSet.setnumber}
                     onChange={handleInputChange}
+                    className="w-full px-2 py-1 border border-gray-300 rounded"
                   />
                 ) : (
                   set.setnumber
                 )}
               </td>
-              <td>
+              <td className="px-4 py-2 text-center">
                 {editingExerciseSetId === set.id ? (
                   <input
                     type="number"
                     name="weight"
                     value={newExerciseSet.weight}
                     onChange={handleInputChange}
+                    className="w-full px-2 py-1 border border-gray-300 rounded"
                   />
                 ) : (
                   set.weight
                 )}
               </td>
-              <td>
+              <td className="px-4 py-2 text-center">
                 {editingExerciseSetId === set.id ? (
                   <input
                     type="number"
                     name="repetitions"
                     value={newExerciseSet.repetitions}
                     onChange={handleInputChange}
+                    className="w-full px-2 py-1 border border-gray-300 rounded"
                   />
                 ) : (
                   set.repetitions
                 )}
               </td>
-              <td>
+              <td className="px-4 py-2 text-center">
                 {editingExerciseSetId === set.id ? (
                   <>
-                    <button onClick={() => handleUpdateExerciseSet(set.id)}>Guardar</button>
-                    <button onClick={() => setEditingExerciseSetId(null)}>Cancelar</button>
+                    <button
+                      onClick={() => handleUpdateExerciseSet(set.id)}
+                      className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 mr-2"
+                    >
+                      Guardar
+                    </button>
+                    <button
+                      onClick={() => setEditingExerciseSetId(null)}
+                      className="px-2 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                    >
+                      Cancelar
+                    </button>
                   </>
                 ) : (
                   <>
-                    <button onClick={() => handleEditExerciseSet(set)}>Editar</button>
-                    <button onClick={() => handleDeleteExerciseSet(set.id)}>Eliminar</button>
+                    <button
+                      onClick={() => handleEditExerciseSet(set)}
+                      className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 mr-2"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => handleDeleteExerciseSet(set.id)}
+                      className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                    >
+                      Eliminar
+                    </button>
                   </>
                 )}
               </td>
@@ -221,54 +273,60 @@ const Routine = () => {
           ))}
         </tbody>
       </table>
-      <div>
-        <h2>Crear nuevo set de ejercicio</h2>
-        <div>
-          <label>Ejercicio:</label>
-          <input
-            type="text"
-            name="machinename"
-            value={newExerciseSet.machinename}
+      <div className="mt-8">
+        <h2 className="text-xl font-bold mb-4">Crear nuevo set de ejercicio</h2>
+        <div className="mb-4">
+          <label htmlFor="exerciseId" className="block mb-1">Ejercicio:</label>
+          <select
+            name="exerciseId"
+            value={newExerciseSet.exerciseId}
             onChange={handleInputChange}
-          />
+            className="w-full px-2 py-1 border border-gray-300 rounded"
+          >
+            <option value="">Seleccionar ejercicio</option>
+            {exercises.map((exercise) => (
+              <option key={exercise.id} value={exercise.id}>
+                {exercise.name}
+              </option>
+            ))}
+          </select>
         </div>
-        <div>
-          <label>Ejercicio:</label>
-          <input
-            type="text"
-            name="machinename"
-            value={newExerciseSet.machinename}
-            onChange={handleInputChange}
-          />
-        </div>
-        <div>
-          <label>Set:</label>
+        <div className="mb-4">
+          <label htmlFor="setnumber" className="block mb-1">Set:</label>
           <input
             type="number"
             name="setnumber"
             value={newExerciseSet.setnumber}
             onChange={handleInputChange}
+            className="w-full px-2 py-1 border border-gray-300 rounded"
           />
         </div>
-        <div>
-          <label>Peso:</label>
+        <div className="mb-4">
+          <label htmlFor="weight" className="block mb-1">Peso:</label>
           <input
             type="number"
             name="weight"
             value={newExerciseSet.weight}
             onChange={handleInputChange}
+            className="w-full px-2 py-1 border border-gray-300 rounded"
           />
         </div>
-        <div>
-          <label>Repeticiones:</label>
+        <div className="mb-4">
+          <label htmlFor="repetitions" className="block mb-1">Repeticiones:</label>
           <input
             type="number"
             name="repetitions"
             value={newExerciseSet.repetitions}
             onChange={handleInputChange}
+            className="w-full px-2 py-1 border border-gray-300 rounded"
           />
         </div>
-         <button onClick={handleCreateExerciseSet}>Crear set</button>
+        <button
+          onClick={handleCreateExerciseSet}
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+        >
+          Crear set
+        </button>
       </div>
     </div>
   );

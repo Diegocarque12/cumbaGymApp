@@ -2,8 +2,8 @@ import RoutineList from "../components/RoutineList";
 
 const Routines = () => {
   return (
-    <div>
-      <h1>Rutinas</h1>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 className="text-4xl font-bold mb-8">Rutinas</h1>
       <RoutineList />
     </div>
   );

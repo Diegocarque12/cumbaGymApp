@@ -22,20 +22,27 @@ const RoutineList = () => {
   };
 
   return (
-    <div>
-      <h1>Lista de Rutinas</h1>
-      <ul>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 className="text-3xl font-bold mb-8">Lista de Rutinas</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {routineList.map((routine) => (
-          <li key={routine.id}>
-            <Link to={`/routines/${routine.id}`}>
-              <Card name={routine.name} />
-            </Link>
-          </li>
+          <Link
+            key={routine.id}
+            to={`/routines/${routine.id}`}
+            className="hover:shadow-lg transition duration-300"
+          >
+            <Card name={routine.name} description={routine.description} />
+          </Link>
         ))}
-      </ul>
-      <Link to="/add-routine">
-        <button>Crear Rutina</button>
-      </Link>
+      </div>
+      <div className="mt-8">
+        <Link
+          to="/add-routine"
+          className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition duration-300"
+        >
+          Crear Rutina
+        </Link>
+      </div>
     </div>
   );
 };
