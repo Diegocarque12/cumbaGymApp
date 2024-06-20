@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import supabase from "../utils/supabaseClient";
+// import supabase from "../utils/supabaseClient";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -12,10 +12,10 @@ const LoginPage = () => {
     e.preventDefault();
 
     try {
-      const { user, error } = await supabase.auth.signIn({ email, password });
+      // const { user, error } = await supabase.auth.signIn({ email, password });
 
       if (error) {
-        throw new Error(error.message);
+        // throw new Error(error.message);
       }
 
       // Redirigir al usuario a la página principal después de iniciar sesión

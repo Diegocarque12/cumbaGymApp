@@ -69,13 +69,13 @@ const TodayWorkout = () => {
         setCompletedSets(updatedCompletedSets);
     };
 
-    const handleWeightChange = (exerciseIndex: number, setIndex: number, value: number) => {
+    const handleWeightChange = (exerciseIndex: number, value: number) => {
         const updatedExerciseSets = [...exerciseSets];
         updatedExerciseSets[exerciseIndex].weight = value;
         setExerciseSets(updatedExerciseSets);
     };
 
-    const handleRepetitionsChange = (exerciseIndex: number, setIndex: number, value: number) => {
+    const handleRepetitionsChange = (exerciseIndex: number, value: number) => {
         const updatedExerciseSets = [...exerciseSets];
         updatedExerciseSets[exerciseIndex].repetitions = value;
         setExerciseSets(updatedExerciseSets);
@@ -136,7 +136,7 @@ const TodayWorkout = () => {
                                                 className="w-20 px-2 py-1 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                 value={exerciseSet.weight}
                                                 onChange={(e) =>
-                                                    handleWeightChange(exerciseIndex, setIndex, parseInt(e.target.value))
+                                                    handleWeightChange(exerciseIndex, parseInt(e.target.value))
                                                 }
                                                 disabled={completedSets[exerciseIndex * exerciseSet.setnumber + setIndex]}
                                             />
@@ -151,7 +151,7 @@ const TodayWorkout = () => {
                                                 className="w-20 px-2 py-1 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                 value={exerciseSet.repetitions}
                                                 onChange={(e) =>
-                                                    handleRepetitionsChange(exerciseIndex, setIndex, parseInt(e.target.value))
+                                                    handleRepetitionsChange(exerciseIndex, parseInt(e.target.value))
                                                 }
                                                 disabled={completedSets[exerciseIndex * exerciseSet.setnumber + setIndex]}
                                             />
