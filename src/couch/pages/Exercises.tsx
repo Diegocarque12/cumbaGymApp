@@ -91,63 +91,7 @@ const Exercises = () => {
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h1 className="text-3xl font-bold mb-8">Ejercicios</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                    <h2 className="text-xl font-bold mb-4">Lista de Ejercicios</h2>
-                    <ul className="space-y-4">
-                        {exercises.map((exercise) => (
-                            <li
-                                key={exercise.id}
-                                className="cursor-pointer hover:bg-gray-100 p-4 rounded"
-                                onClick={() => handleExerciseClick(exercise)}
-                            >
-                                {exercise.name}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-                <div>
-                    {selectedExercise && (
-                        <div>
-                            <h2 className="text-xl font-bold mb-4">Detalles del Ejercicio</h2>
-                            <p>
-                                <strong>Nombre:</strong> {selectedExercise.name}
-                            </p>
-                            <p>
-                                <strong>Descripción:</strong> {selectedExercise.description}
-                            </p>
-                            <p>
-                                <strong>Categoría:</strong> {selectedExercise.category}
-                            </p>
-                            <p>
-                                <strong>Músculo objetivo:</strong> {selectedExercise.target_muscle}
-                            </p>
-                            <p>
-                                <strong>Equipo:</strong> {selectedExercise.equipment}
-                            </p>
-                            <p>
-                                <strong>Dificultad:</strong> {selectedExercise.difficulty}
-                            </p>
-                            <p>
-                                <strong>Instrucciones:</strong> {selectedExercise.instructions}
-                            </p>
-                            {selectedExercise.video_url && (
-                                <div className="mt-4">
-                                    <h3 className="text-lg font-bold mb-2">Video demostrativo</h3>
-                                    <video src={selectedExercise.video_url} controls className="w-full"></video>
-                                </div>
-                            )}
-                            {selectedExercise.image_url && (
-                                <div className="mt-4">
-                                    <h3 className="text-lg font-bold mb-2">Imagen ilustrativa</h3>
-                                    <img src={selectedExercise.image_url} alt={selectedExercise.name} className="w-full" />
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-            </div>
-            <div className="mt-8">
+            <div className="mb-8">
                 <button
                     onClick={() => setShowAddExercise(!showAddExercise)}
                     className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -270,6 +214,62 @@ const Exercises = () => {
                         </button>
                     </div>
                 )}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h2 className="text-xl font-bold mb-4">Lista de Ejercicios</h2>
+                    <ul className="space-y-4">
+                        {exercises.map((exercise) => (
+                            <li
+                                key={exercise.id}
+                                className="cursor-pointer hover:bg-gray-100 p-4 rounded"
+                                onClick={() => handleExerciseClick(exercise)}
+                            >
+                                {exercise.name}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+                <div>
+                    {selectedExercise && (
+                        <div>
+                            <h2 className="text-xl font-bold mb-4">Detalles del Ejercicio</h2>
+                            <p>
+                                <strong>Nombre:</strong> {selectedExercise.name}
+                            </p>
+                            <p>
+                                <strong>Descripción:</strong> {selectedExercise.description}
+                            </p>
+                            <p>
+                                <strong>Categoría:</strong> {selectedExercise.category}
+                            </p>
+                            <p>
+                                <strong>Músculo objetivo:</strong> {selectedExercise.target_muscle}
+                            </p>
+                            <p>
+                                <strong>Equipo:</strong> {selectedExercise.equipment}
+                            </p>
+                            <p>
+                                <strong>Dificultad:</strong> {selectedExercise.difficulty}
+                            </p>
+                            <p>
+                                <strong>Instrucciones:</strong> {selectedExercise.instructions}
+                            </p>
+                            {selectedExercise.video_url && (
+                                <div className="mt-4">
+                                    <h3 className="text-lg font-bold mb-2">Video demostrativo</h3>
+                                    <video src={selectedExercise.video_url} controls className="w-full"></video>
+                                </div>
+                            )}
+                            {selectedExercise.image_url && (
+                                <div className="mt-4">
+                                    <h3 className="text-lg font-bold mb-2">Imagen ilustrativa</h3>
+                                    <img src={selectedExercise.image_url} alt={selectedExercise.name} className="w-full" />
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

@@ -48,13 +48,41 @@ const TodayWorkout = () => {
             if (exerciseSetsError) {
                 throw new Error(exerciseSetsError.message);
             }
-            setExerciseSets(exerciseSetsData as ExerciseSet[]);
-            setCompletedSets(new Array(exerciseSetsData.length).fill(false));
 
-        } catch (err) {
-            setError("Error al obtener los sets de ejercicios");
+            const exerciseSetsWithNames = await Promise.all(
+                exerciseSetsData.map(async (exerciseSet) => {
+                    const exerciseName = await getExerciseName(exerciseSet.exerciseId);
+                    return { ...exerciseSet, exerciseName };
+                })
+            );
+
+            setExerciseSets(exerciseSetsWithNames);
+            setCompletedSets(new Array(exerciseSetsWithNames.length).fill(false));
+        } catch (error) {
+            console.error("Error al obtener los sets de ejercicios:", error);
         }
     };
+
+
+    const getExerciseName = async (exerciseId: number) => {
+        try {
+            const { data, error } = await supabase
+                .from("exercises")
+                .select("name")
+                .eq("id", exerciseId)
+                .single();
+
+            if (error) {
+                throw new Error(error.message);
+            }
+
+            return data.name;
+        } catch (error) {
+            console.error("Error al obtener el nombre del ejercicio:", error);
+            return "";
+        }
+    };
+
 
     const handleRoutineChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
         const routineId = parseInt(event.target.value);
@@ -121,7 +149,7 @@ const TodayWorkout = () => {
                     <h3 className="text-xl font-semibold mb-2">Lista de Ejercicios</h3>
                     {exerciseSets.map((exerciseSet, exerciseIndex) => (
                         <div key={exerciseSet.id} className="mb-8">
-                            <h3 className="text-xl font-semibold mb-2">Ejercicio: {exerciseSet.exerciseId}</h3>
+                            <h3 className="text-xl font-semibold mb-2">Ejercicio: {exerciseSet.exerciseName}</h3>
                             {Array.from({ length: exerciseSet.setnumber }).map((_, setIndex) => (
                                 <div key={`${exerciseSet.id}-${setIndex}`} className="bg-gray-100 p-4 rounded-lg mb-4">
                                     <p className="text-lg font-medium mb-2">Set: {setIndex + 1}</p>

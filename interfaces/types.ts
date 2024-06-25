@@ -28,6 +28,7 @@ export interface ExerciseSet {
   setnumber: number;
   weight: number;
   repetitions: number;
+  exerciseName?: string;
 }
 
 export interface Exercise {
