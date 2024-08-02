@@ -126,9 +126,9 @@ const CreateRoutine = () => {
   }
 
   return (
-    <div className="max-w-lg mx-4 mt-4">
+    <div className="mt-4 mx-12">
       <h1 className="text-2xl font-bold mb-4">Rutinas</h1>
-      <table className="w-full border-collapse">
+      <table className=" border-collapse w-full">
         <thead>
           <tr>
             <th className="px-4 py-2 bg-gray-200 text-left">Nombre</th>
@@ -146,7 +146,7 @@ const CreateRoutine = () => {
                     name="name"
                     value={editingRoutine.name}
                     onChange={(e) => setEditingRoutine({ ...editingRoutine, name: e.target.value })}
-                    className="w-full px-2 py-1 border border-gray-300 rounded"
+                    className=" px-2 py-1 border border-gray-300 rounded"
                   />
                 ) : (
                   routine.name.length > 20 ? `${routine.name.slice(0, 20)}...` : routine.name
@@ -159,7 +159,7 @@ const CreateRoutine = () => {
                     name="description"
                     value={editingRoutine.description}
                     onChange={(e) => setEditingRoutine({ ...editingRoutine, description: e.target.value })}
-                    className="w-full px-2 py-1 border border-gray-300 rounded"
+                    className=" px-2 py-1 border border-gray-300 rounded"
                   />
                 ) : (
                   routine?.description?.length > 30 ? `${routine.description.slice(0, 30)}...` : routine?.description
@@ -276,7 +276,7 @@ const CreateRoutine = () => {
             name="name"
             value={newRoutine.name}
             onChange={handleInputChange}
-            className="w-full px-2 py-1 border border-gray-300 rounded"
+            className=" px-2 py-1 border border-gray-300 rounded"
           />
         </div>
         <div className="mb-4">
@@ -286,7 +286,7 @@ const CreateRoutine = () => {
             name="description"
             value={newRoutine.description}
             onChange={handleInputChange}
-            className="w-full px-2 py-1 border border-gray-300 rounded"
+            className=" px-2 py-1 border border-gray-300 rounded"
           />
         </div>
         <button
