@@ -20,12 +20,17 @@ const Routine = () => {
   const [editingExerciseSetId, setEditingExerciseSetId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [users, setUsers] = useState<{ id: number; name: string }[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState<string>('');
+
 
   useEffect(() => {
     fetchRoutine();
     fetchExerciseSets();
     fetchExercises();
+    fetchUsersWithoutRoutine();
   }, [routineid]);
+
 
   const fetchRoutine = async () => {
     try {
@@ -73,6 +78,40 @@ const Routine = () => {
       setError("Error al obtener los ejercicios");
     }
   };
+
+  const handleAssignRoutine = async () => {
+    if (!selectedUserId) return;
+
+    try {
+      const { error } = await supabase
+        .from('userroutines')
+        .insert({ userid: selectedUserId, routineid: routineid });
+
+      if (error) throw error;
+
+      // Refresh the user list after assigning
+      fetchUsersWithoutRoutine();
+      setSelectedUserId('');
+    } catch (err) {
+      setError("Error al asignar la rutina");
+    }
+  };
+
+
+  const fetchUsersWithoutRoutine = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, name')
+
+
+      if (error) throw error;
+      setUsers(data || []);
+    } catch (err) {
+      setError("Error al obtener usuarios sin esta rutina");
+    }
+  };
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -273,6 +312,33 @@ const Routine = () => {
           ))}
         </tbody>
       </table>
+
+      <div className="mt-8">
+        <h2 className="text-xl font-bold mb-4">Asignar Rutina</h2>
+        <div className="mb-4">
+          <label htmlFor="userId" className="block mb-1">Usuario:</label>
+          <select
+            name="userId"
+            value={selectedUserId}
+            onChange={(e) => setSelectedUserId(e.target.value)}
+            className="w-full px-2 py-1 border border-gray-300 rounded"
+          >
+            <option value="">Seleccionar usuario</option>
+            {users.map((user) => (
+              <option key={user.id} value={user.id}>
+                {user.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <button
+          onClick={handleAssignRoutine}
+          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+        >
+          Asignar Rutina
+        </button>
+      </div>
+
       <div className="mt-8">
         <h2 className="text-xl font-bold mb-4">Crear nuevo set de ejercicio</h2>
         <div className="mb-4">
