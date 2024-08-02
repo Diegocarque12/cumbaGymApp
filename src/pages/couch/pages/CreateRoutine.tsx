@@ -9,8 +9,15 @@ const CreateRoutine = () => {
     name: "",
     description: "",
   });
+  const [editingRoutine, setEditingRoutine] = useState<Routine>({
+    id: 0,
+    name: "",
+    description: "",
+  });
+
   const [editingRoutineId, setEditingRoutineId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -43,7 +50,7 @@ const CreateRoutine = () => {
     try {
       const { data, error } = await supabase
         .from("routines")
-        .insert([{ name: newRoutine.name }]);
+        .insert([{ name: newRoutine.name, description: newRoutine.description }]);
       if (error) {
         throw new Error(error.message);
       }
@@ -55,30 +62,46 @@ const CreateRoutine = () => {
   };
 
   const handleEditRoutine = (routine: Routine) => {
+    setIsEditing(true);
     setEditingRoutineId(routine.id);
-    setNewRoutine(routine);
+    setEditingRoutine(routine);
   };
 
+
   const handleUpdateRoutine = async (routineId: number) => {
+    console.log(routineId);
+
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("routines")
-        .update({ name: newRoutine.name, description: newRoutine.description })
-        .eq("id", routineId);
+        .update({ name: editingRoutine.name, description: editingRoutine.description })
+        .eq("id", routineId)
+        .select();
+
       if (error) {
         throw new Error(error.message);
       }
-      setRoutines((prevRoutines) =>
-        prevRoutines.map((routine) =>
-          routine.id === routineId ? { ...routine, name: newRoutine.name } : routine
-        )
-      );
-      setNewRoutine({ id: 0, name: "", description: "" });
-      setEditingRoutineId(null);
+
+      if (data && data.length > 0) {
+        console.log(data);
+
+        setRoutines((prevRoutines) =>
+          prevRoutines.map((routine) =>
+            routine.id === routineId ? data[0] : routine
+          )
+        );
+        setNewRoutine({ id: 0, name: "", description: "" });
+        setEditingRoutineId(null);
+        setIsEditing(false);
+      } else {
+        throw new Error("No se recibieron datos actualizados");
+      }
     } catch (err) {
-      setError("Error al actualizar la rutina");
+      setError("Error al actualizar la rutina: " + (err as Error).message);
     }
   };
+
+
 
   const handleDeleteRoutine = async (routineId: number) => {
     try {
@@ -103,7 +126,7 @@ const CreateRoutine = () => {
   }
 
   return (
-    <div className="max-w-lg mx-auto">
+    <div className="max-w-lg mx-4 mt-4">
       <h1 className="text-2xl font-bold mb-4">Rutinas</h1>
       <table className="w-full border-collapse">
         <thead>
@@ -115,18 +138,18 @@ const CreateRoutine = () => {
         </thead>
         <tbody>
           {routines.map((routine) => (
-            <tr key={routine.id} className="border-t">
+            <tr key={routine?.id} className="border-t">
               <td className="px-4 py-2">
                 {editingRoutineId === routine.id ? (
                   <input
                     type="text"
                     name="name"
-                    value={newRoutine.name}
-                    onChange={handleInputChange}
+                    value={editingRoutine.name}
+                    onChange={(e) => setEditingRoutine({ ...editingRoutine, name: e.target.value })}
                     className="w-full px-2 py-1 border border-gray-300 rounded"
                   />
                 ) : (
-                  routine.name
+                  routine.name.length > 20 ? `${routine.name.slice(0, 20)}...` : routine.name
                 )}
               </td>
               <td className="px-4 py-2">
@@ -134,12 +157,12 @@ const CreateRoutine = () => {
                   <input
                     type="text"
                     name="description"
-                    value={newRoutine.description}
-                    onChange={handleInputChange}
+                    value={editingRoutine.description}
+                    onChange={(e) => setEditingRoutine({ ...editingRoutine, description: e.target.value })}
                     className="w-full px-2 py-1 border border-gray-300 rounded"
                   />
                 ) : (
-                  routine.description
+                  routine?.description?.length > 30 ? `${routine.description.slice(0, 30)}...` : routine?.description
                 )}
               </td>
               <td className="px-4 py-2">
@@ -149,13 +172,45 @@ const CreateRoutine = () => {
                       onClick={() => handleUpdateRoutine(routine.id)}
                       className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 mr-2"
                     >
-                      Guardar
+                      <span className="hidden md:block">Guardar</span>
+                      <span className="md:hidden">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="w-4 h-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+                          />
+                        </svg>
+                      </span>
                     </button>
                     <button
                       onClick={() => setEditingRoutineId(null)}
                       className="px-2 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
                     >
-                      Cancelar
+                      <span className="hidden md:block">Cancelar</span>
+                      <span className="md:hidden">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="w-4 h-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </span>
                     </button>
                   </>
                 ) : (
@@ -164,13 +219,46 @@ const CreateRoutine = () => {
                       onClick={() => handleEditRoutine(routine)}
                       className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 mr-2"
                     >
-                      Editar
+                      <span className="hidden md:block">Editar</span>
+                      <span className="md:hidden">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="w-4 h-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                          />
+                        </svg>
+                      </span>
                     </button>
                     <button
                       onClick={() => handleDeleteRoutine(routine.id)}
                       className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                     >
-                      Eliminar
+
+                      <span className="hidden md:block">Eliminar</span>
+                      <span className="md:hidden">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="w-4 h-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
+                      </span>
                     </button>
                   </>
                 )}
@@ -179,7 +267,7 @@ const CreateRoutine = () => {
           ))}
         </tbody>
       </table>
-      <div className="mt-8">
+      <div className="mt-8 mx-4">
         <h2 className="text-xl font-bold mb-4">Crear nueva rutina</h2>
         <div className="mb-4">
           <label htmlFor="name" className="block mb-1">Nombre de la rutina</label>
@@ -202,6 +290,8 @@ const CreateRoutine = () => {
           />
         </div>
         <button
+          type="button"
+          disabled={isEditing}
           onClick={handleCreateRoutine}
           className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
         >

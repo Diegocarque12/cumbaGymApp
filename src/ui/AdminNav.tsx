@@ -24,7 +24,7 @@ const Nav = () => {
     <nav className="bg-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center">
+          <div className="flex items-center justify-between w-full">
             <a
               href='/couch/dashboard'
               className='flex items-center space-x-3 rtl:space-x-reverse'
@@ -93,7 +93,7 @@ const Nav = () => {
 
               </div>
             </div>
-            <div className="-mr-2 flex md:hidden">
+            <div className="-mr-2 flex md:hidden ">
               <button
                 onClick={toggleMenu}
                 type="button"
@@ -135,7 +135,7 @@ const Nav = () => {
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               <Link
                 to="/couch/dashboard"
-                className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === "/dashboard"
+                className={`block px-3 py-2 rounded-md text-base font-medium ${location.pathname === "/dashboard"
                   ? "bg-gray-900 text-white"
                   : "text-gray-300 hover:bg-gray-700 hover:text-white"
                   }`}
@@ -144,7 +144,7 @@ const Nav = () => {
               </Link>
               <Link
                 to="/couch/routines"
-                className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === "/routines"
+                className={`block px-3 py-2 rounded-md text-base font-medium ${location.pathname === "/routines"
                   ? "bg-gray-900 text-white"
                   : "text-gray-300 hover:bg-gray-700 hover:text-white"
                   }`}
@@ -153,7 +153,7 @@ const Nav = () => {
               </Link>
               <Link
                 to="/couch/exercises"
-                className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === "/exercises"
+                className={`block px-3 py-2 rounded-md text-base font-medium ${location.pathname === "/exercises"
                   ? "bg-gray-900 text-white"
                   : "text-gray-300 hover:bg-gray-700 hover:text-white"
                   }`}
@@ -162,7 +162,7 @@ const Nav = () => {
               </Link>
               <Link
                 to="/couch/today-workout"
-                className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === "/today-workout"
+                className={`block px-3 py-2 rounded-md text-base font-medium ${location.pathname === "/today-workout"
                   ? "bg-gray-900 text-white"
                   : "text-gray-300 hover:bg-gray-700 hover:text-white"
                   }`}
@@ -171,7 +171,7 @@ const Nav = () => {
               </Link>
               <Link
                 to="/couch/users"
-                className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === "/users"
+                className={`block px-3 py-2 rounded-md text-base font-medium ${location.pathname === "/users"
                   ? "bg-gray-900 text-white"
                   : "text-gray-300 hover:bg-gray-700 hover:text-white"
                   }`}>
@@ -179,7 +179,7 @@ const Nav = () => {
               </Link>
               <button
                 onClick={handleLogout}
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
               >
                 Cerrar sesión
               </button>
