@@ -1,12 +1,23 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import supabase from "../utils/supabaseClient";
 
 const Nav = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate("/login");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
   };
 
   return (
@@ -15,7 +26,7 @@ const Nav = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <a
-              href='/dashboard'
+              href='/user/dashboard'
               className='flex items-center space-x-3 rtl:space-x-reverse'
             >
               <img
@@ -29,8 +40,8 @@ const Nav = () => {
             </a>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
-                <Link
-                  to="/dashboard"
+                {/* <Link
+                  to="/user/dashboard"
                   className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === "/dashboard"
                     ? "bg-gray-900 text-white"
                     : "text-gray-300 hover:bg-gray-700 hover:text-white"
@@ -39,7 +50,7 @@ const Nav = () => {
                   Inicio
                 </Link>
                 <Link
-                  to="/routines"
+                  to="/user/routines"
                   className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === "/routines"
                     ? "bg-gray-900 text-white"
                     : "text-gray-300 hover:bg-gray-700 hover:text-white"
@@ -48,16 +59,16 @@ const Nav = () => {
                   Rutinas
                 </Link>
                 <Link
-                  to="/exercises"
+                  to="/user/exercises"
                   className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === "/exercises"
                     ? "bg-gray-900 text-white"
                     : "text-gray-300 hover:bg-gray-700 hover:text-white"
                     }`}
                 >
                   Ejercicios
-                </Link>
+                </Link> */}
                 <Link
-                  to="/today-workout"
+                  to="/user/today-workout"
                   className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === "/today-workout"
                     ? "bg-gray-900 text-white"
                     : "text-gray-300 hover:bg-gray-700 hover:text-white"
@@ -65,14 +76,20 @@ const Nav = () => {
                 >
                   Rutina de hoy
                 </Link>
-                <Link
-                  to="/users"
+                {/* <Link
+                  to="/user/users"
                   className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === "/users"
                     ? "bg-gray-900 text-white"
                     : "text-gray-300 hover:bg-gray-700 hover:text-white"
                     }`}>
                   Usuarios
-                </Link>
+                </Link> */}
+                <button
+                  onClick={handleLogout}
+                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                >
+                  Cerrar sesión
+                </button>
 
               </div>
             </div>
@@ -116,8 +133,8 @@ const Nav = () => {
         {isOpen && (
           <div className="md:hidden" id="mobile-menu">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              <Link
-                to="/dashboard"
+              {/* <Link
+                to="/user/dashboard"
                 className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === "/dashboard"
                   ? "bg-gray-900 text-white"
                   : "text-gray-300 hover:bg-gray-700 hover:text-white"
@@ -126,7 +143,7 @@ const Nav = () => {
                 Inicio
               </Link>
               <Link
-                to="/routines"
+                to="/user/routines"
                 className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === "/routines"
                   ? "bg-gray-900 text-white"
                   : "text-gray-300 hover:bg-gray-700 hover:text-white"
@@ -135,16 +152,16 @@ const Nav = () => {
                 Rutinas
               </Link>
               <Link
-                to="/exercises"
+                to="/user/exercises"
                 className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === "/exercises"
                   ? "bg-gray-900 text-white"
                   : "text-gray-300 hover:bg-gray-700 hover:text-white"
                   }`}
               >
                 Ejercicios
-              </Link>
+              </Link> */}
               <Link
-                to="/today-workout"
+                to="/user/today-workout"
                 className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === "/today-workout"
                   ? "bg-gray-900 text-white"
                   : "text-gray-300 hover:bg-gray-700 hover:text-white"
@@ -152,14 +169,20 @@ const Nav = () => {
               >
                 Rutina de hoy
               </Link>
-              <Link
-                to="/users"
+              {/* <Link
+                to="/user/users"
                 className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === "/users"
                   ? "bg-gray-900 text-white"
                   : "text-gray-300 hover:bg-gray-700 hover:text-white"
                   }`}>
                 Usuarios
-              </Link>
+              </Link> */}
+              <button
+                onClick={handleLogout}
+                className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+              >
+                Cerrar sesión
+              </button>
             </div>
           </div>
         )}

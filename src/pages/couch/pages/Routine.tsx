@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import supabase from "../../utils/supabaseClient";
-import type { Exercise, ExerciseSet, Routine } from "../../../interfaces/types";
+import supabase from "../../../utils/supabaseClient";
+import type { Exercise, ExerciseSet, Routine } from "../../../../interfaces/types";
 
 const Routine = () => {
   const { routineId } = useParams<{ routineId: string }>();

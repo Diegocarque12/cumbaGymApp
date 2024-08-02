@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import supabase from "../../utils/supabaseClient";
-import type { Routine } from "../../../interfaces/types";
+import supabase from "../../../utils/supabaseClient";
+import type { Routine } from "../../../../interfaces/types";
 
 const CreateRoutine = () => {
   const [routines, setRoutines] = useState<Routine[]>([]);

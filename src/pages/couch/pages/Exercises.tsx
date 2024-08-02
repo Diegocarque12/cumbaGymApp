@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import supabase from "../../utils/supabaseClient";
-import type { Exercise } from "../../../interfaces/types";
+import supabase from "../../../utils/supabaseClient";
+import type { Exercise } from "../../../../interfaces/types";
 
 const Exercises = () => {
     const [exercises, setExercises] = useState<Exercise[]>([]);

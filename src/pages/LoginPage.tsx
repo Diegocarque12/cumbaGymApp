@@ -1,29 +1,57 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import supabase from "../utils/supabaseClient";
 // import supabase from "../utils/supabaseClient";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberSession, setRememberSession] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      // const { user, error } = await supabase.auth.signIn({ email, password });
+      console.log(email, password);
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
       if (error) {
-        // throw new Error(error.message);
+        throw new Error(error.message);
       }
 
-      // Redirigir al usuario a la página principal después de iniciar sesión
-      navigate("/dashboard");
+      if (data.user) {
+        console.log(data.user);
+        console.log(data.user.id);
+
+        const { data: userWithRole } = await supabase.from("users").select("*").eq('user_id_auth', data.user.id).single();
+        console.log(userWithRole);
+        if (userWithRole) {
+          console.log(userWithRole.role);
+          if (userWithRole.role === 'couch') {
+            navigate("/couch/dashboard");
+          } else if (userWithRole.role === 'user') {
+            navigate("/user/dashboard");
+          }
+        }
+        // console.log('Usuario autenticado:', data.user);
+        setRememberSession(true);
+        // navigate("/couch/dashboard");
+      } else {
+        throw new Error("No se pudo autenticar al usuario");
+      }
+
     } catch (err) {
+      console.error(err);
       setError("Error al iniciar sesión. Por favor, verifica tus credenciales.");
     }
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-800 to-black">
@@ -60,6 +88,18 @@ const LoginPage = () => {
               placeholder="Ingresa tu contraseña"
               required
             />
+          </div>
+          <div className="flex items-center mb-6">
+            <input
+              type="checkbox"
+              id="rememberSession"
+              checked={rememberSession}
+              onChange={(e) => setRememberSession(e.target.checked)}
+              className="mr-2"
+            />
+            <label htmlFor="rememberSession" className="text-sm text-gray-600">
+              Recordar sesión
+            </label>
           </div>
           <button
             type="submit"

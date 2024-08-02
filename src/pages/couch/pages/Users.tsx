@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import supabase from "../../utils/supabaseClient";
-import type { User, Routine, Measurement } from "../../../interfaces/types";
+import supabase from "../../../utils/supabaseClient";
+import type { User, Routine, Measurement } from "../../../../interfaces/types";
 
 const Users = () => {
     const [users, setUsers] = useState<User[]>([]);
@@ -35,6 +35,7 @@ const Users = () => {
 
     useEffect(() => {
         fetchUsers();
+
     }, []);
 
     const fetchUsers = async () => {

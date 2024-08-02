@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Card from "../../ui/Card";
-import supabase from "../../utils/supabaseClient";
-import type { Routine } from "../../../interfaces/types";
+import Card from "../../../ui/Card";
+import supabase from "../../../utils/supabaseClient";
+import type { Routine } from "../../../../interfaces/types";
 
 const RoutineList = () => {
   const [routineList, setRoutinesList] = useState<Routine[]>([]);
@@ -26,7 +26,7 @@ const RoutineList = () => {
       <h1 className="text-3xl font-bold mb-8">Lista de Rutinas</h1>
       <div className="mb-8">
         <Link
-          to="/add-routine"
+          to="/couch/add-routine"
           className="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition duration-300"
         >
           Crear Rutina
@@ -36,7 +36,7 @@ const RoutineList = () => {
         {routineList.map((routine) => (
           <Link
             key={routine.id}
-            to={`/routines/${routine.id}`}
+            to={`/couch/routines/${routine.id}`}
             className="hover:shadow-lg transition duration-300"
           >
             <Card name={routine.name} description={routine.description} />

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import supabase from "../../utils/supabaseClient";
+import supabase from "../../../utils/supabaseClient";
 
 const Dashboard = () => {
   const [userCount, setUserCount] = useState(0);
@@ -80,7 +80,7 @@ const Dashboard = () => {
                 <div className="bg-gray-50 px-4 py-4 sm:px-6">
                   <div className="text-sm">
                     <Link
-                      to="/users"
+                      to="/couch/users"
                       className="font-medium text-indigo-600 hover:text-indigo-500"
                     >
                       Ver detalles
@@ -125,7 +125,7 @@ const Dashboard = () => {
                 <div className="bg-gray-50 px-4 py-4 sm:px-6">
                   <div className="text-sm">
                     <Link
-                      to="/routines"
+                      to="/couch/routines"
                       className="font-medium text-indigo-600 hover:text-indigo-500"
                     >
                       Ver detalles
@@ -170,7 +170,7 @@ const Dashboard = () => {
                 <div className="bg-gray-50 px-4 py-4 sm:px-6">
                   <div className="text-sm">
                     <Link
-                      to="/exercises"
+                      to="/couch/exercises"
                       className="font-medium text-indigo-600 hover:text-indigo-500"
                     >
                       Ver detalles
