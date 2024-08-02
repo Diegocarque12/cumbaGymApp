@@ -16,7 +16,6 @@ const UserDashboard = () => {
         role: string;
         user_id_auth: string;
     } | null>(null); const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -42,7 +41,7 @@ const UserDashboard = () => {
                 console.log(userData);
 
             } catch (err) {
-                setError("Error al obtener los datos del usuario");
+                console.log("Error al obtener los datos del usuario");
             } finally {
                 setIsLoading(false);
             }
