@@ -11,6 +11,7 @@ const NewUserForm = () => {
         goal: "",
         startDate: new Date(),
         gender: "",
+        isActive: true,
     });
     const [error, setError] = useState<string | null>(null);
 
@@ -30,6 +31,7 @@ const NewUserForm = () => {
                 goal: "",
                 startDate: new Date(),
                 gender: "",
+                isActive: true,
             });
             setError(null);
             window.location.reload()
