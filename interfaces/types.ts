@@ -7,7 +7,7 @@ export interface User {
   goal?: string;
   startDate: Date;
   gender: string;
-  state: boolean;
+  isActive: boolean;
   deletedAt?: Date;
 }
 

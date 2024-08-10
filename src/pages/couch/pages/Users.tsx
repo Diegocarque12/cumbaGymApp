@@ -131,7 +131,7 @@ const Users = () => {
 						.map((user) => (
 							<Dialog key={user.id}>
 								<DialogTrigger>
-									<div className="bg-gray-50 rounded-xl shadow-md p-6 hover:shadow-xl transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 cursor-pointer" onClick={() => handleUserClick(user)}>
+									<div className={`bg-gray-50 rounded-xl shadow-md p-6 hover:shadow-xl transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 cursor-pointer ${!user.isActive ? 'bg-gray-400' : ''}`} onClick={() => handleUserClick(user)}>
 										<div className="flex flex-col">
 											<h2 className="text-xl font-semibold text-gray-800 mb-2">{user.name} {user.lastName}</h2>
 											<p className="text-sm text-gray-600">Edad: {user.age}</p>
