@@ -2,438 +2,252 @@ import { useEffect, useState } from "react";
 import supabase from "../../../utils/supabaseClient";
 import type { User, Routine, Measurement } from "../../../../interfaces/types";
 
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog"
+import { Link } from "react-router-dom";
+import NewUserForm from "../components/users/NewUserForm";
+
+
 const Users = () => {
-    const [users, setUsers] = useState<User[]>([]);
-    const [selectedUser, setSelectedUser] = useState<User | null>(null);
-    const [userRoutines, setUserRoutines] = useState<Routine[]>([]);
-    const [showAddUser, setShowAddUser] = useState(false);
-    const [showAddMeasurement, setShowAddMeasurement] = useState(false);
-    const [userMeasurements, setUserMeasurements] = useState<Measurement[]>([]);
-    const [newUser, setNewUser] = useState<User>({
-        id: 0,
-        nationalId: "",
-        name: "",
-        lastName: "",
-        age: 0,
-        goal: "",
-        startDate: new Date(),
-        gender: "",
-    });
-    const [newMeasurement, setNewMeasurement] = useState<Measurement>({
-        id: 0,
-        userid: 0,
-        leftArm: 0,
-        rightArm: 0,
-        upperWaist: 0,
-        lowerWaist: 0,
-        leftThigh: 0,
-        rightThigh: 0,
-        measurementDate: new Date(),
-    });
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+	const [users, setUsers] = useState<User[]>([]);
+	const [selectedUser, setSelectedUser] = useState<User | null>(null);
+	const [userRoutines, setUserRoutines] = useState<Routine[]>([]);
+	const [userMeasurements, setUserMeasurements] = useState<Measurement[]>([]);
 
-    useEffect(() => {
-        fetchUsers();
+	const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
 
-    }, []);
+	useEffect(() => {
+		fetchUsers();
+	}, []);
 
-    const fetchUsers = async () => {
-        try {
-            const { data, error } = await supabase.from("users").select("*");
-            if (error) {
-                throw new Error(error.message);
-            }
-            setUsers(data as User[]);
-        } catch (err) {
-            setError("Error al obtener los usuarios");
-        } finally {
-            setIsLoading(false);
-        }
-    };
+	const fetchUsers = async () => {
+		try {
+			const { data, error } = await supabase.from("users").select("*");
+			if (error) {
+				throw new Error(error.message);
+			}
+			setUsers(data as User[]);
+		} catch (err) {
+			setError("Error al obtener los usuarios");
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
-    const fetchUserRoutines = async (userId: number) => {
-        try {
-            const { data, error } = await supabase
-                .from("userroutines")
-                .select("*, routines(*)")
-                .eq("userid", userId);
-            if (error) {
-                throw new Error(error.message);
-            }
-            setUserRoutines(data.map((item) => item.routines) as Routine[]);
-        } catch (err) {
-            setError("Error al obtener las rutinas del usuario");
-        }
-    };
+	const fetchUserRoutines = async (userId: number) => {
+		try {
+			const { data, error } = await supabase
+				.from("userroutines")
+				.select("*, routines(*)")
+				.eq("userId", userId);
+			if (error) {
+				throw new Error(error.message);
+			}
+			setUserRoutines(data.map((item) => item.routines) as Routine[]);
+		} catch (err) {
+			// setError("Error al obtener las rutinas del usuario");
+		}
+	};
 
-    const fetchUserMeasurements = async (userId: number) => {
-        try {
-            const { data, error } = await supabase
-                .from("measurements")
-                .select("*")
-                .eq("userid", userId);
-            if (error) {
-                throw new Error(error.message);
-            }
-            setUserMeasurements(data as Measurement[]);
-        } catch (err) {
-            setError("Error al obtener las medidas del usuario");
-        }
-    };
+	const fetchUserMeasurements = async (userId: number) => {
+		try {
+			const { data, error } = await supabase
+				.from("measurements")
+				.select("*")
+				.eq("userId", userId);
+			if (error) {
+				throw new Error(error.message);
+			}
+			setUserMeasurements(data as Measurement[]);
+		} catch (err) {
+			// setError("Error al obtener las medidas del usuario");
+		}
+	};
 
-    const handleUserClick = (user: User) => {
-        setSelectedUser(user);
-        fetchUserRoutines(user.id);
-        fetchUserMeasurements(user.id);
-    };
+	const handleUserClick = (user: User) => {
+		setSelectedUser(user);
+		if (user.id !== undefined) {
+			fetchUserRoutines(user.id);
+			fetchUserMeasurements(user.id);
+		}
+	};
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setNewUser((prevUser) => ({
-            ...prevUser,
-            [name]: value,
-        }));
-    };
+	if (isLoading) {
+		return <div>Cargando...</div>;
+	}
 
-    const handleMeasurementInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setNewMeasurement((prevMeasurement) => ({
-            ...prevMeasurement,
-            [name]: value,
-        }));
-    };
+	if (error) {
+		return <div>{error}</div>;
+	}
 
-    const handleCreateUser = async () => {
-        try {
-            const { data, error } = await supabase.from("users").insert([newUser]);
-            if (error) {
-                throw new Error(error.message);
-            }
-            setUsers((prevUsers) => [...prevUsers, ...(data ?? [])]);
-            setNewUser({
-                id: 0,
-                nationalId: "",
-                name: "",
-                lastName: "",
-                age: 0,
-                goal: "",
-                startDate: new Date(),
-                gender: "",
-            });
-        } catch (err) {
-            setError("Error al crear el usuario");
-        }
-    };
+	return (
+		<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 container">
+			<div className="flex justify-between items-center my-8">
+				<h1 className="text-4xl font-bold text-gray-800">Usuarios</h1>
+				<Dialog>
+					<DialogTrigger>
+						<button
+							className="px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition duration-300 ease-in-out shadow-lg hidden lg:block"
+						>
+							Agregar Usuario
+						</button>
+					</DialogTrigger>
+					<DialogContent className="max-w-md overflow-y-auto max-h-screen">
+						<DialogHeader>
+							<DialogTitle className="text-2xl font-bold mb-6 text-center text-gray-800">Formulario De Registro</DialogTitle>
+							<DialogDescription>
+								<NewUserForm />
+							</DialogDescription>
+						</DialogHeader>
+					</DialogContent>
+				</Dialog>
+			</div >
+			<div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+					{users.map((user) => (
+						<Dialog key={user.id}>
+							<DialogTrigger>
+								<div className="bg-gray-50 rounded-xl shadow-md p-6 hover:shadow-xl transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 cursor-pointer" onClick={() => handleUserClick(user)}>
+									<div className="flex flex-col">
+										<h2 className="text-xl font-semibold text-gray-800 mb-2">{user.name} {user.lastName}</h2>
+										<p className="text-sm text-gray-600">Edad: {user.age}</p>
+										<p className="text-sm text-gray-600">Objetivo: {user.goal}</p>
+									</div>
+								</div>
+							</DialogTrigger>
+							<DialogContent className="w-full max-w-3xl overflow-y-auto max-h-screen">
+								<DialogHeader>
+									<DialogTitle className="text-2xl font-bold mb-6 text-center text-gray-800">Detalles del Usuario</DialogTitle>
+									<DialogDescription>
+										<div>
+											<div className="bg-gradient-to-r from-blue-600 to-blue-900 rounded-xl shadow-2xl p-4 sm:p-8 text-white mb-8">
+												<div className="flex flex-col sm:flex-row items-center mb-6 justify-between">
+													<h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-0">{selectedUser?.name} {selectedUser?.lastName}</h2>
+													<div className="ml-auto">
+														<Link to={`/couch/users/${selectedUser?.id}/edit`} className="text-white font-semibold hover:text-blue-200 transition duration-300 ease-in-out">
+															<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
+																<path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+															</svg>
+															Editar
+														</Link>
+													</div>
+												</div>
+												<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+													<div className="bg-white bg-opacity-20 rounded-lg p-4">
+														<p className="text-sm uppercase tracking-wide mb-1">Edad</p>
+														<p className="text-xl sm:text-2xl font-semibold">{selectedUser?.age} años</p>
+													</div>
+													<div className="bg-white bg-opacity-20 rounded-lg p-4">
+														<p className="text-sm uppercase tracking-wide mb-1">Género</p>
+														<p className="text-xl sm:text-2xl font-semibold capitalize">{selectedUser?.gender}</p>
+													</div>
+													<div className="bg-white bg-opacity-20 rounded-lg p-4">
+														<p className="text-sm uppercase tracking-wide mb-1">Objetivo</p>
+														<p className="text-xl sm:text-2xl font-semibold capitalize">{selectedUser?.goal}</p>
+													</div>
+													<div className="bg-white bg-opacity-20 rounded-lg p-4">
+														<p className="text-sm uppercase tracking-wide mb-1">Fecha de Inicio</p>
+														<p className="text-xl sm:text-2xl font-semibold">
+															{selectedUser?.startDate
+																? new Date(selectedUser?.startDate).toLocaleDateString()
+																: "No disponible"}
+														</p>
+													</div>
+												</div>
+											</div>
+											<h3 className="text-2xl font-bold mt-10 mb-6 text-gray-800">Rutinas</h3>
+											<div className="space-y-3 flex flex-col gap-2">
+												{userRoutines.length > 0 ? (
+													userRoutines.map((routine) => (
+														<Link className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out" to={`/couch/routines/${routine.id}`} key={routine.id}>{routine.name}</Link>
+													))
+												) : (
+													<p className="text-gray-600 italic">El usuario no tiene rutinas asignadas.</p>
+												)}
+											</div>
+											<div className="flex flex-col sm:flex-row justify-between items-center h-auto mt-10 mb-6">
+												<h3 className="text-2xl font-bold text-gray-800 mb-4 sm:mb-0">Últimas Medidas</h3>
+												<Link to={`/couch/users/${user.id}/measurements`}
+													className="px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition duration-300 ease-in-out shadow-lg"
+												>
+													Agregar Medida
+												</Link>
+											</div>
+											{userMeasurements.length > 0 ? (
+												<ul className="space-y-6">
+													{userMeasurements.map((measurement) => (
+														<li key={measurement.id} className="bg-gray-50 rounded-xl p-4 sm:p-6 shadow-md">
+															<p className="text-lg font-semibold mb-3 text-gray-800">
+																<strong>Fecha:</strong>{" "}
+																{measurement.measurementDate
+																	? new Date(measurement.measurementDate).toLocaleDateString()
+																	: ""}
+															</p>
+															<div className="grid grid-cols-2 gap-4 mb-6">
+																<span className="text-gray-700"><strong>Peso: </strong>{measurement?.weight ? measurement?.weight : 'NA'} kg</span>
+																<span className="text-gray-700"><strong>Altura: </strong>{measurement?.height ? measurement?.height : 'NA'} cm</span>
+															</div>
 
-    const handleCreateMeasurement = async () => {
-        try {
-            const { data, error } = await supabase.from("measurements").insert([
-                {
-                    ...newMeasurement,
-                    userId: selectedUser?.id,
-                    measurementDate: new Date(), // Establecer la fecha actual
-                },
-            ]);
-            if (error) {
-                throw new Error(error.message);
-            }
-            setUserMeasurements((prevMeasurements) => [...prevMeasurements, ...(data ?? [])]);
-            setNewMeasurement({
-                id: 0,
-                userid: 0,
-                leftArm: 0,
-                rightArm: 0,
-                upperWaist: 0,
-                lowerWaist: 0,
-                leftThigh: 0,
-                rightThigh: 0,
-                measurementDate: new Date(),
-            });
-            setShowAddMeasurement(false); // Ocultar el formulario después de agregar la medida
-        } catch (err) {
-            setError("Error al crear la medida");
-        }
-    };
+															<div className="relative w-full sm:w-64 h-96 mx-auto">
+																{selectedUser?.gender === 'masculino' ? (
+																	<img src="/assets/men-human-outline.png" alt="Men Silhouette" className="w-full h-full flex justify-center items-center object-contain" />
+																) : (
+																	<img src="/assets/woman-human-outline.png" alt="Woman Silhouette" className="w-full h-full flex justify-center items-center object-contain" />
+																)}
 
-    if (isLoading) {
-        return <div>Cargando...</div>;
-    }
+																<span className="absolute top-24 left-4 bg-blue-100 px-2 py-1 rounded-full text-sm">{measurement.leftArm} cm</span>
+																<span className="absolute top-24 right-4 bg-blue-100 px-2 py-1 rounded-full text-sm">{measurement.rightArm} cm</span>
 
-    if (error) {
-        return <div>{error}</div>;
-    }
+																<span className="absolute top-32 left-1/2 transform -translate-x-1/2 bg-blue-100 px-2 py-1 rounded-full text-sm">{measurement.upperWaist} cm</span>
+																<span className="absolute top-40 left-1/2 transform -translate-x-1/2 bg-blue-100 px-2 py-1 rounded-full text-sm">{measurement.lowerWaist} cm</span>
 
-    return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 container">
-            <h1 className="text-3xl font-bold mb-8">Usuarios</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                    <h2 className="text-xl font-bold mb-4">Lista de Usuarios</h2>
-                    <ul className="space-y-4">
-                        {users.map((user) => (
-                            <li
-                                key={user.id}
-                                className="cursor-pointer hover:bg-gray-100 p-4 rounded"
-                                onClick={() => handleUserClick(user)}
-                            >
-                                {user.name} {user.lastName}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-                <div>
-                    {selectedUser && (
-                        <div>
-                            <h2 className="text-xl font-bold mb-4">Detalles del Usuario</h2>
-                            <p>
-                                <strong>Nombre:</strong> {selectedUser.name} {selectedUser.lastName}
-                            </p>
-                            <p>
-                                <strong>Edad:</strong> {selectedUser.age}
-                            </p>
-                            <p>
-                                <strong>Género:</strong> {selectedUser.gender}
-                            </p>
-                            <p>
-                                <strong>Objetivo:</strong> {selectedUser.goal}
-                            </p>
-                            <p>
-                                <p>
-                                    <strong>Fecha de Inicio:</strong>{" "}
-                                    {selectedUser.startDate
-                                        ? new Date(selectedUser.startDate).toLocaleDateString()
-                                        : ""}
-                                </p>
-                            </p>
-                            <h3 className="text-lg font-bold mt-8 mb-4">Rutinas del Usuario</h3>
-                            <ul className="space-y-2">
-                                {userRoutines.map((routine) => (
-                                    <li key={routine.id}>{routine.name}</li>
-                                ))}
-                            </ul>
-                            <h3 className="text-lg font-bold mt-8 mb-4">Medidas del Usuario</h3>
-                            <ul className="space-y-2">
-                                {userMeasurements.map((measurement) => (
-                                    <li key={measurement.id}>
-                                        <p>
-                                            <strong>Fecha:</strong>{" "}
-                                            {measurement.measurementDate
-                                                ? new Date(measurement.measurementDate).toLocaleDateString()
-                                                : ""}
-                                        </p>
-                                        <p>
-                                            <strong>Brazo Izquierdo:</strong> {measurement.leftArm} cm
-                                        </p>
-                                        <p>
-                                            <strong>Brazo Derecho:</strong> {measurement.rightArm} cm
-                                        </p>
-                                        <p>
-                                            <strong>Cintura Superior:</strong> {measurement.upperWaist} cm
-                                        </p>
-                                        <p>
-                                            <strong>Cintura Inferior:</strong> {measurement.lowerWaist} cm
-                                        </p>
-                                        <p>
-                                            <strong>Muslo Izquierdo:</strong> {measurement.leftThigh} cm
-                                        </p>
-                                        <p>
-                                            <strong>Muslo Derecho:</strong> {measurement.rightThigh}cm
-                                        </p>
-                                    </li>
-                                ))}
-                            </ul>
-                            <h3 className="text-lg font-bold mt-8 mb-4">Agregar Medida</h3>
+																<span className="absolute bottom-32 left-8 bg-blue-100 px-2 py-1 rounded-full text-sm">{measurement.leftThigh} cm</span>
+																<span className="absolute bottom-32 right-8 bg-blue-100 px-2 py-1 rounded-full text-sm">{measurement.rightThigh} cm</span>
+															</div>
+														</li>
+													))}
+												</ul>
+											) : (
+												<p className="text-gray-600 italic">El usuario no tiene medidas registradas.</p>
+											)}
+										</div>
+									</DialogDescription>
+								</DialogHeader>
+							</DialogContent>
+						</Dialog>
+					))}
+				</div>
+			</div>
 
-                            <div className="mt-8">
-                                <button
-                                    onClick={() => setShowAddMeasurement(!showAddMeasurement)}
-                                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                >
-                                    {showAddMeasurement ? "Ocultar" : "Agregar Medida"}
-                                </button>
-                                {showAddMeasurement && (
-                                    <div className="mt-4 space-y-4">
-                                        <div className="space-y-4">
-                                            <div>
-                                                <label htmlFor="leftArm" className="block mb-1">
-                                                    Brazo Izquierdo:
-                                                </label>
-                                                <input
-                                                    type="number"
-                                                    name="leftArm"
-                                                    value={newMeasurement.leftArm}
-                                                    onChange={handleMeasurementInputChange}
-                                                    className="w-full px-2 py-1 border border-gray-300 rounded"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label htmlFor="rightArm" className="block mb-1">
-                                                    Brazo Derecho:
-                                                </label>
-                                                <input
-                                                    type="number"
-                                                    name="rightArm"
-                                                    value={newMeasurement.rightArm}
-                                                    onChange={handleMeasurementInputChange}
-                                                    className="w-full px-2 py-1 border border-gray-300 rounded"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label htmlFor="upperWaist" className="block mb-1">
-                                                    Cintura Superior:
-                                                </label>
-                                                <input
-                                                    type="number"
-                                                    name="upperWaist"
-                                                    value={newMeasurement.upperWaist}
-                                                    onChange={handleMeasurementInputChange}
-                                                    className="w-full px-2 py-1 border border-gray-300 rounded"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label htmlFor="lowerWaist" className="block mb-1">
-                                                    Cintura Inferior:
-                                                </label>
-                                                <input
-                                                    type="number"
-                                                    name="lowerWaist"
-                                                    value={newMeasurement.lowerWaist}
-                                                    onChange={handleMeasurementInputChange}
-                                                    className="w-full px-2 py-1 border border-gray-300 rounded"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label htmlFor="leftThigh" className="block mb-1">
-                                                    Muslo Izquierdo:
-                                                </label>
-                                                <input
-                                                    type="number"
-                                                    name="leftThigh"
-                                                    value={newMeasurement.leftThigh}
-                                                    onChange={handleMeasurementInputChange}
-                                                    className="w-full px-2 py-1 border border-gray-300 rounded"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label htmlFor="rightThigh" className="block mb-1">
-                                                    Muslo Derecho:
-                                                </label>
-                                                <input
-                                                    type="number"
-                                                    name="rightThigh"
-                                                    value={newMeasurement.rightThigh}
-                                                    onChange={handleMeasurementInputChange}
-                                                    className="w-full px-2 py-1 border border-gray-300 rounded"
-                                                />
-                                            </div>
-                                        </div>
-                                        <button
-                                            onClick={handleCreateMeasurement}
-                                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                                        >
-                                            Agregar Medida
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
-            <div className="mt-8">
-                <h2 className="text-xl font-bold mb-4">Agregar Usuario</h2>
-                <button
-                    onClick={() => setShowAddUser(!showAddUser)}
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                >
-                    {showAddUser ? "Ocultar" : "Agregar Usuario"}
-                </button>
-                {showAddUser && (
-                    <div className="space-y-4">
-                        <div>
-                            <label htmlFor="nationalId" className="block mb-1">
-                                Cédula:
-                            </label>
-                            <input
-                                type="text"
-                                name="nationalId"
-                                value={newUser.nationalId}
-                                onChange={handleInputChange}
-                                className="w-full px-2 py-1 border border-gray-300 rounded"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="name" className="block mb-1">
-                                Nombre:
-                            </label>
-                            <input
-                                type="text"
-                                name="name"
-                                value={newUser.name}
-                                onChange={handleInputChange}
-                                className="w-full px-2 py-1 border border-gray-300 rounded"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="lastName" className="block mb-1">
-                                Apellido:
-                            </label>
-                            <input
-                                type="text"
-                                name="lastName"
-                                value={newUser.lastName}
-                                onChange={handleInputChange}
-                                className="w-full px-2 py-1 border border-gray-300 rounded"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="age" className="block mb-1">
-                                Edad:
-                            </label>
-                            <input
-                                type="number"
-                                name="age"
-                                value={newUser.age}
-                                onChange={handleInputChange}
-                                className="w-full px-2 py-1 border border-gray-300 rounded"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="goal" className="block mb-1">
-                                Objetivo:
-                            </label>
-                            <input
-                                type="text"
-                                name="goal"
-                                value={newUser.goal}
-                                onChange={handleInputChange}
-                                className="w-full px-2 py-1 border border-gray-300 rounded"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="gender" className="block mb-1">
-                                Género:
-                            </label>
-                            <input
-                                type="text"
-                                name="gender"
-                                value={newUser.gender}
-                                onChange={handleInputChange}
-                                className="w-full px-2 py-1 border border-gray-300 rounded"
-                            />
-                        </div>
-                        <button
-                            onClick={handleCreateUser}
-                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                        >
-                            Agregar Usuario
-                        </button>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
+			<div className="fixed bottom-8 right-8">
+				<Dialog>
+					<DialogTrigger>
+						<button className="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition duration-300 ease-in-out shadow-lg block lg:hidden">
+							<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+							</svg>
+							Agregar Usuario
+						</button>
+					</DialogTrigger>
+					<DialogContent className="w-full max-w-md overflow-y-auto max-h-screen">
+						<DialogHeader>
+							<DialogTitle className="text-2xl font-bold mb-6 text-center text-gray-800">Formulario De Registro</DialogTitle>
+							<DialogDescription>
+								<NewUserForm />
+							</DialogDescription>
+						</DialogHeader>
+					</DialogContent>
+				</Dialog>
+			</div>
+		</div >
+	);
 };
 
 export default Users;

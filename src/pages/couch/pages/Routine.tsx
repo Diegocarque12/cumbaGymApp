@@ -85,7 +85,7 @@ const Routine = () => {
     try {
       const { error } = await supabase
         .from('userroutines')
-        .insert({ userid: selectedUserId, routineid: routineid });
+        .insert({ userId: selectedUserId, routineid: routineid });
 
       if (error) throw error;
 
