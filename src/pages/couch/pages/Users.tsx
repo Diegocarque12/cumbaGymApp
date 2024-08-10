@@ -30,7 +30,10 @@ const Users = () => {
 
 	const fetchUsers = async () => {
 		try {
-			const { data, error } = await supabase.from("users").select("*");
+			const { data, error } = await supabase
+				.from("users")
+				.select("*")
+				.is("deletedAt", null);
 			if (error) {
 				throw new Error(error.message);
 			}

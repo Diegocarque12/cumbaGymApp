@@ -7,6 +7,8 @@ export interface User {
   goal?: string;
   startDate: Date;
   gender: string;
+  state: boolean;
+  deletedAt?: Date;
 }
 
 export interface Routine {
