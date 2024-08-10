@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import supabase from "../utils/supabaseClient";
 
@@ -6,6 +6,10 @@ const Nav = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location]);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -21,79 +25,34 @@ const Nav = () => {
   };
 
   return (
-    <nav className="bg-gray-800">
+    <nav className="bg-gray-800 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center justify-between w-full">
-            <a
-              href='/couch/dashboard'
+            <Link
+              to='/couch/dashboard'
               className='flex items-center space-x-3 rtl:space-x-reverse'
             >
-              <img
-                src='https://flowbite.com/docs/images/logo.svg'
-                className='h-8'
-                alt='Flowbite Logo'
-              />
-              <span className='self-center text-2xl font-semibold whitespace-nowrap dark:text-white'>
+              <span className='self-center text-2xl font-semibold whitespace-nowrap'>
                 CumbaGym
               </span>
-            </a>
+            </Link>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
-                <Link
-                  to="/couch/dashboard"
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === "/dashboard"
-                    ? "bg-gray-900 text-white"
-                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                    }`}
-                >
-                  Inicio
-                </Link>
-                <Link
-                  to="/couch/routines"
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === "/routines"
-                    ? "bg-gray-900 text-white"
-                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                    }`}
-                >
-                  Rutinas
-                </Link>
-                <Link
-                  to="/couch/exercises"
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === "/exercises"
-                    ? "bg-gray-900 text-white"
-                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                    }`}
-                >
-                  Ejercicios
-                </Link>
-                <Link
-                  to="/couch/today-workout"
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === "/today-workout"
-                    ? "bg-gray-900 text-white"
-                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                    }`}
-                >
-                  Rutina de hoy
-                </Link>
-                <Link
-                  to="/couch/users"
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === "/users"
-                    ? "bg-gray-900 text-white"
-                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                    }`}>
-                  Usuarios
-                </Link>
+                <NavLink to="/couch/dashboard" label="Inicio" />
+                <NavLink to="/couch/routines" label="Rutinas" />
+                <NavLink to="/couch/exercises" label="Ejercicios" />
+                <NavLink to="/couch/today-workout" label="Rutina de hoy" />
+                <NavLink to="/couch/users" label="Usuarios" />
                 <button
                   onClick={handleLogout}
-                  className="px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700"
                 >
                   Cerrar sesión
                 </button>
-
               </div>
             </div>
-            <div className="-mr-2 flex md:hidden ">
+            <div className="-mr-2 flex md:hidden">
               <button
                 onClick={toggleMenu}
                 type="button"
@@ -103,25 +62,11 @@ const Nav = () => {
               >
                 <span className="sr-only">Abrir menú</span>
                 {isOpen ? (
-                  <svg
-                    className="block h-6 w-6"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
+                  <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 ) : (
-                  <svg
-                    className="block h-6 w-6"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
+                  <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
                   </svg>
                 )}
@@ -133,53 +78,14 @@ const Nav = () => {
         {isOpen && (
           <div className="md:hidden" id="mobile-menu">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              <Link
-                to="/couch/dashboard"
-                className={`block px-3 py-2 rounded-md text-base font-medium ${location.pathname === "/dashboard"
-                  ? "bg-gray-900 text-white"
-                  : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                  }`}
-              >
-                Inicio
-              </Link>
-              <Link
-                to="/couch/routines"
-                className={`block px-3 py-2 rounded-md text-base font-medium ${location.pathname === "/routines"
-                  ? "bg-gray-900 text-white"
-                  : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                  }`}
-              >
-                Rutinas
-              </Link>
-              <Link
-                to="/couch/exercises"
-                className={`block px-3 py-2 rounded-md text-base font-medium ${location.pathname === "/exercises"
-                  ? "bg-gray-900 text-white"
-                  : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                  }`}
-              >
-                Ejercicios
-              </Link>
-              <Link
-                to="/couch/today-workout"
-                className={`block px-3 py-2 rounded-md text-base font-medium ${location.pathname === "/today-workout"
-                  ? "bg-gray-900 text-white"
-                  : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                  }`}
-              >
-                Rutina de hoy
-              </Link>
-              <Link
-                to="/couch/users"
-                className={`block px-3 py-2 rounded-md text-base font-medium ${location.pathname === "/users"
-                  ? "bg-gray-900 text-white"
-                  : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                  }`}>
-                Usuarios
-              </Link>
+              <MobileNavLink to="/couch/dashboard" label="Inicio" />
+              <MobileNavLink to="/couch/routines" label="Rutinas" />
+              <MobileNavLink to="/couch/exercises" label="Ejercicios" />
+              <MobileNavLink to="/couch/today-workout" label="Rutina de hoy" />
+              <MobileNavLink to="/couch/users" label="Usuarios" />
               <button
                 onClick={handleLogout}
-                className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
+                className="w-full text-left px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700"
               >
                 Cerrar sesión
               </button>
@@ -188,7 +94,36 @@ const Nav = () => {
         )}
       </div>
     </nav>
+  );
+};
 
+const NavLink = ({ to, label }: { to: string; label: string }) => {
+  const location = useLocation();
+  return (
+    <Link
+      to={to}
+      className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === to
+        ? "bg-gray-900 text-white"
+        : "text-gray-300 hover:bg-gray-700 hover:text-white"
+        }`}
+    >
+      {label}
+    </Link>
+  );
+};
+
+const MobileNavLink = ({ to, label }: { to: string; label: string }) => {
+  const location = useLocation();
+  return (
+    <Link
+      to={to}
+      className={`block px-3 py-2 rounded-md text-base font-medium ${location.pathname === to
+        ? "bg-gray-900 text-white"
+        : "text-gray-300 hover:bg-gray-700 hover:text-white"
+        }`}
+    >
+      {label}
+    </Link>
   );
 };
 
