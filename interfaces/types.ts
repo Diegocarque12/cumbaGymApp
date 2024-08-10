@@ -1,5 +1,5 @@
 export interface User {
-  id: number;
+  id?: number;
   nationalId: string;
   name: string;
   lastName: string;
@@ -7,6 +7,8 @@ export interface User {
   goal?: string;
   startDate: Date;
   gender: string;
+  isActive: boolean;
+  deletedAt?: Date;
 }
 
 export interface Routine {
@@ -46,12 +48,14 @@ export interface Exercise {
 
 export interface Measurement {
   id: number;
-    userid: number;
+    userId: number;
     leftArm: number;
     rightArm: number;
     upperWaist: number;
     lowerWaist: number;
     leftThigh: number;
     rightThigh: number;
+    weight: number;
+    height: number;
     measurementDate: Date;
 }

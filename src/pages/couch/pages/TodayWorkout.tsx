@@ -125,7 +125,7 @@ const TodayWorkout = () => {
     }
 
     return (
-        <div className="max-w-lg mx-auto">
+        <div className="max-w-lg mx-auto container">
             <h2 className="text-2xl font-bold mb-4">Rutina del día</h2>
             {!isRoutineSelected && (
                 <div className="mb-4">

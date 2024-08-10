@@ -2,6 +2,18 @@ import { useEffect, useState } from "react";
 import supabase from "../../../utils/supabaseClient";
 import type { Routine } from "../../../../interfaces/types";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+
+
 const CreateRoutine = () => {
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [newRoutine, setNewRoutine] = useState<Routine>({
@@ -126,9 +138,9 @@ const CreateRoutine = () => {
   }
 
   return (
-    <div className="max-w-lg mx-4 mt-4">
+    <div className="mt-4 mx-12 container">
       <h1 className="text-2xl font-bold mb-4">Rutinas</h1>
-      <table className="w-full border-collapse">
+      <table className=" border-collapse w-full">
         <thead>
           <tr>
             <th className="px-4 py-2 bg-gray-200 text-left">Nombre</th>
@@ -146,7 +158,7 @@ const CreateRoutine = () => {
                     name="name"
                     value={editingRoutine.name}
                     onChange={(e) => setEditingRoutine({ ...editingRoutine, name: e.target.value })}
-                    className="w-full px-2 py-1 border border-gray-300 rounded"
+                    className=" px-2 py-1 border border-gray-300 rounded"
                   />
                 ) : (
                   routine.name.length > 20 ? `${routine.name.slice(0, 20)}...` : routine.name
@@ -159,7 +171,7 @@ const CreateRoutine = () => {
                     name="description"
                     value={editingRoutine.description}
                     onChange={(e) => setEditingRoutine({ ...editingRoutine, description: e.target.value })}
-                    className="w-full px-2 py-1 border border-gray-300 rounded"
+                    className=" px-2 py-1 border border-gray-300 rounded"
                   />
                 ) : (
                   routine?.description?.length > 30 ? `${routine.description.slice(0, 30)}...` : routine?.description
@@ -267,37 +279,53 @@ const CreateRoutine = () => {
           ))}
         </tbody>
       </table>
-      <div className="mt-8 mx-4">
-        <h2 className="text-xl font-bold mb-4">Crear nueva rutina</h2>
-        <div className="mb-4">
-          <label htmlFor="name" className="block mb-1">Nombre de la rutina</label>
-          <input
-            type="text"
-            name="name"
-            value={newRoutine.name}
-            onChange={handleInputChange}
-            className="w-full px-2 py-1 border border-gray-300 rounded"
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="description" className="block mb-1">Descripción</label>
-          <input
-            type="text"
-            name="description"
-            value={newRoutine.description}
-            onChange={handleInputChange}
-            className="w-full px-2 py-1 border border-gray-300 rounded"
-          />
-        </div>
-        <button
-          type="button"
-          disabled={isEditing}
-          onClick={handleCreateRoutine}
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-        >
-          Crear
-        </button>
-      </div>
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button variant="outline">Crear una nueva rutina</Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Crear Rutina</DialogTitle>
+            <DialogDescription>
+              Make changes to your profile here. Click save when you're done.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4">
+            <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b border-gray-200 pb-2">Crear nueva rutina</h2>
+            <div className="mb-6">
+              <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-700">Nombre de la rutina</label>
+              <input
+                type="text"
+                name="name"
+                value={newRoutine.name}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black transition duration-200 ease-in-out bg-gray-50"
+              />
+            </div>
+            <div className="mb-6">
+              <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-700">Descripción</label>
+              <input
+                type="text"
+                name="description"
+                value={newRoutine.description}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-black focus:border-black transition duration-200 ease-in-out bg-gray-50"
+              />
+            </div>
+            <button
+              type="button"
+              disabled={isEditing}
+              onClick={handleCreateRoutine}
+              className="w-full px-6 py-3 bg-black text-white rounded-lg shadow-md hover:bg-gray-800 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Crear
+            </button>
+          </div>
+          <DialogFooter>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 };
