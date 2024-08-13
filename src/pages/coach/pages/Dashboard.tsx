@@ -80,7 +80,7 @@ const Dashboard = () => {
                 <div className="bg-gray-50 px-4 py-4 sm:px-6">
                   <div className="text-sm">
                     <Link
-                      to="/couch/users"
+                      to="/coach/users"
                       className="font-medium text-indigo-600 hover:text-indigo-500"
                     >
                       Ver detalles
@@ -125,7 +125,7 @@ const Dashboard = () => {
                 <div className="bg-gray-50 px-4 py-4 sm:px-6">
                   <div className="text-sm">
                     <Link
-                      to="/couch/routines"
+                      to="/coach/routines"
                       className="font-medium text-indigo-600 hover:text-indigo-500"
                     >
                       Ver detalles
@@ -170,7 +170,7 @@ const Dashboard = () => {
                 <div className="bg-gray-50 px-4 py-4 sm:px-6">
                   <div className="text-sm">
                     <Link
-                      to="/couch/exercises"
+                      to="/coach/exercises"
                       className="font-medium text-indigo-600 hover:text-indigo-500"
                     >
                       Ver detalles

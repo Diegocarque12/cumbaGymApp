@@ -12,6 +12,7 @@ const NewUserForm = () => {
         startDate: new Date(),
         gender: "",
         isActive: true,
+        role: "usuario",
     });
     const [error, setError] = useState<string | null>(null);
 
@@ -32,6 +33,7 @@ const NewUserForm = () => {
                 startDate: new Date(),
                 gender: "",
                 isActive: true,
+                role: "usuario",
             });
             setError(null);
             window.location.reload()
@@ -136,6 +138,24 @@ const NewUserForm = () => {
                         <option value="otro">Otro</option>
                     </select>
                 </div>
+                <div>
+                    <label htmlFor="roles" className="block text-gray-700 text-sm font-bold mb-2">
+                        Roles:
+                    </label>
+                    <select
+                        id="roles"
+                        name="roles"
+                        value={newUser.role}
+                        onChange={handleInputChange}
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        multiple
+                    >
+                        <option value="user">Usuario</option>
+                        <option value="admin">Administrador</option>
+                        <option value="coach">Entrenador</option>
+                    </select>
+                </div>
+
                 <div className="flex items-center justify-center">
                     <button
                         onClick={handleCreateUser}

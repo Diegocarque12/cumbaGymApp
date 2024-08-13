@@ -1,4 +1,4 @@
-// src/couch/pages/TodayWorkout.tsx
+// src/coach/pages/TodayWorkout.tsx
 import { useState, useEffect } from "react";
 import supabase from "../../../utils/supabaseClient";
 import type { Routine, ExerciseSet } from "../../../../interfaces/types";
@@ -11,15 +11,11 @@ const TodayWorkout = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isRoutineSelected, setIsRoutineSelected] = useState(false);
+    const [currentScreen, setCurrentScreen] = useState("select-routine");
 
     useEffect(() => {
         fetchRoutines();
     }, []);
-
-    useEffect(() => {
-        console.log(exerciseSets);
-        console.log(completedSets);
-    }, [exerciseSets, completedSets]);
 
 
     const fetchRoutines = async () => {
@@ -126,6 +122,26 @@ const TodayWorkout = () => {
 
     return (
         <div className="max-w-lg mx-auto container">
+            <div className="flex items-center mb-4">
+                <label htmlFor="screenSwitch" className="mr-3">Cambiar pantalla:</label>
+                <div className="flex items-center space-x-4">
+                    <span className="mr-3">Usuarios Presentes</span>
+                    <label className="flex items-center cursor-pointer">
+                        <div className="relative">
+                            <input
+                                type="checkbox"
+                                className="sr-only"
+                                checked={currentScreen === "presentUsers"}
+                                onChange={() => setCurrentScreen(currentScreen === "myWorkout" ? "presentUsers" : "myWorkout")}
+                            />
+                            <div className="w-10 h-4 bg-gray-400 rounded-full shadow-inner"></div>
+                            <div className={`absolute w-6 h-6 bg-white rounded-full shadow -left-1 -top-1 transition ${currentScreen === "presentUsers" ? "transform translate-x-full bg-blue-600" : ""}`}></div>
+                        </div>
+                    </label>
+                    <span className="ml-3">Mi Entrenamiento</span>
+                </div>
+            </div>
+
             <h2 className="text-2xl font-bold mb-4">Rutina del día</h2>
             {!isRoutineSelected && (
                 <div className="mb-4">

@@ -1,4 +1,4 @@
-// src/couch/pages/TodayWorkout.tsx
+// src/coach/pages/TodayWorkout.tsx
 import { useState, useEffect } from "react";
 import supabase from "../../../utils/supabaseClient";
 import type { Routine, ExerciseSet } from "../../../../interfaces/types";

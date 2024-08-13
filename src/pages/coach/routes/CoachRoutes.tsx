@@ -24,7 +24,7 @@ const CouchRoutes = () => {
         <Route path="/routines/:routineId" element={<Routine />} />
         <Route path="/add-routine" element={<CreateRoutine />} />
         <Route path="/today-workout" element={<TodayWorkout />} />
-        <Route path="/" element={<Navigate to="couch/dashboard" replace />} />
+        <Route path="/" element={<Navigate to="coach/dashboard" replace />} />
       </Routes>
     </>
   );

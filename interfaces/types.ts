@@ -9,6 +9,7 @@ export interface User {
   gender: string;
   isActive: boolean;
   deletedAt?: Date;
+  role: 'user' | 'coach' | 'admin';
 }
 
 export interface Routine {

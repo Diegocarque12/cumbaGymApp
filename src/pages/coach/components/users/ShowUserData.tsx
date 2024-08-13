@@ -102,7 +102,7 @@ const ShowUserData = () => {
                 .eq('id', userId);
             if (error) console.error('Error deactivating user:', error);
             else {
-                navigate('/couch/users')
+                navigate('/coach/users')
             }
         }
     };
@@ -115,7 +115,7 @@ const ShowUserData = () => {
                 .eq('id', userId);
             if (error) console.error('Error deleting user:', error);
             else {
-                navigate('/couch/users')
+                navigate('/coach/users')
             }
         }
     };
@@ -193,14 +193,37 @@ const ShowUserData = () => {
                                 />
                             </div>
                             <div>
-                                <label htmlFor="gender" className="block text-sm font-medium text-gray-700">Género</label>
-                                <input
+                                <label htmlFor="gender" className="block text-gray-700 text-sm font-bold mb-2">
+                                    Género:
+                                </label>
+                                <select
                                     id="gender"
-                                    type="text"
+                                    name="gender"
                                     value={user.gender}
                                     onChange={(e) => setUser({ ...user, gender: e.target.value })}
-                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                />
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                >
+                                    <option value="">Seleccione un género</option>
+                                    <option value="masculino">Masculino</option>
+                                    <option value="femenino">Femenino</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label htmlFor="rol" className="block text-gray-700 text-sm font-bold mb-2">
+                                    Rol:
+                                </label>
+                                <select
+                                    id="rol"
+                                    name="rol"
+                                    value={user.role}
+                                    onChange={(e) => setUser({ ...user, role: e.target.value as "user" | "admin" | "coach" })}
+                                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                >
+                                    <option value="">Seleccione un rol</option>
+                                    <option value="coach">Entrenador</option>
+                                    <option value="usuario">Usuario</option>
+                                </select>
                             </div>
                             <button type="submit" className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                 Guardar
@@ -215,6 +238,7 @@ const ShowUserData = () => {
                             <p className="capitalize"><span className="font-semibold">Objetivo:</span> {user.goal || 'No establecido'}</p>
                             <p><span className="font-semibold">Fecha de Inicio:</span> {new Date(user.startDate).toLocaleDateString()}</p>
                             <p className="capitalize"><span className="font-semibold ">Género:</span> {user.gender}</p>
+                            <p className="capitalize"><span className="font-semibold">Rol de Usuario:</span> {user.role}</p>
                             <div className="flex justify-between">
                                 <button onClick={() => setEditMode(true)} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-600 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">

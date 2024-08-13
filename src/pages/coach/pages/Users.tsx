@@ -148,7 +148,7 @@ const Users = () => {
 													<div className="flex flex-col sm:flex-row items-center mb-6 justify-between">
 														<h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-0">{selectedUser?.name} {selectedUser?.lastName}</h2>
 														<div className="ml-auto">
-															<Link to={`/couch/users/${selectedUser?.id}/edit`} className="text-white font-semibold hover:text-blue-200 transition duration-300 ease-in-out">
+															<Link to={`/coach/users/${selectedUser?.id}/edit`} className="text-white font-semibold hover:text-blue-200 transition duration-300 ease-in-out">
 																<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
 																	<path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
 																</svg>
@@ -183,7 +183,7 @@ const Users = () => {
 												<div className="space-y-3 flex flex-col gap-2">
 													{userRoutines.length > 0 ? (
 														userRoutines.map((routine) => (
-															<Link className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out" to={`/couch/routines/${routine.id}`} key={routine.id}>{routine.name}</Link>
+															<Link className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out" to={`/coach/routines/${routine.id}`} key={routine.id}>{routine.name}</Link>
 														))
 													) : (
 														<p className="text-gray-600 italic">El usuario no tiene rutinas asignadas.</p>
@@ -191,7 +191,7 @@ const Users = () => {
 												</div>
 												<div className="flex flex-col sm:flex-row justify-between items-center h-auto mt-10 mb-6">
 													<h3 className="text-2xl font-bold text-gray-800 mb-4 sm:mb-0">Últimas Medidas</h3>
-													<Link to={`/couch/users/${user.id}/measurements`}
+													<Link to={`/coach/users/${user.id}/measurements`}
 														className="px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition duration-300 ease-in-out shadow-lg"
 													>
 														Agregar Medida

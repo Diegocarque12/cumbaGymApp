@@ -12,40 +12,29 @@ const LoginPage = () => {
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     try {
-      console.log(email, password);
-
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-
       if (error) {
         throw new Error(error.message);
       }
-
       if (data.user) {
-        console.log(data.user);
-        console.log(data.user.id);
-
         const { data: userWithRole } = await supabase.from("users").select("*").eq('user_id_auth', data.user.id).single();
-        console.log(userWithRole);
         if (userWithRole) {
-          console.log(userWithRole.role);
-          if (userWithRole.role === 'couch') {
-            navigate("/couch/dashboard");
-          } else if (userWithRole.role === 'user') {
+          if (userWithRole.role === 'admin') {
+            navigate("/coach/dashboard");
+          } else if (userWithRole.role === 'coach') {
+            navigate("/user/dashboard");
+          } else {
             navigate("/user/dashboard");
           }
         }
-        // console.log('Usuario autenticado:', data.user);
         setRememberSession(true);
-        // navigate("/couch/dashboard");
       } else {
         throw new Error("No se pudo autenticar al usuario");
       }
-
     } catch (err) {
       console.error(err);
       setError("Error al iniciar sesión. Por favor, verifica tus credenciales.");
