@@ -122,7 +122,7 @@ const TodayWorkout = () => {
 
     return (
         <div className="max-w-lg mx-auto container">
-            <div className="flex items-center mb-4">
+            {/* <div className="flex items-center mb-4">
                 <label htmlFor="screenSwitch" className="mr-3">Cambiar pantalla:</label>
                 <div className="flex items-center space-x-4">
                     <span className="mr-3">Usuarios Presentes</span>
@@ -140,7 +140,7 @@ const TodayWorkout = () => {
                     </label>
                     <span className="ml-3">Mi Entrenamiento</span>
                 </div>
-            </div>
+            </div> */}
 
             <h2 className="text-2xl font-bold mb-4">Rutina del día</h2>
             {!isRoutineSelected && (
