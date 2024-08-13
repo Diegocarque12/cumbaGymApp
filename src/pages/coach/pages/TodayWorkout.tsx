@@ -11,7 +11,7 @@ const TodayWorkout = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isRoutineSelected, setIsRoutineSelected] = useState(false);
-    const [currentScreen, setCurrentScreen] = useState("select-routine");
+    // const [currentScreen, setCurrentScreen] = useState("select-routine");
 
     useEffect(() => {
         fetchRoutines();

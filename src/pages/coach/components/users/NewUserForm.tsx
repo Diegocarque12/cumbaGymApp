@@ -12,7 +12,7 @@ const NewUserForm = () => {
         startDate: new Date(),
         gender: "",
         isActive: true,
-        role: "usuario",
+        role: "user",
     });
     const [error, setError] = useState<string | null>(null);
 
@@ -33,13 +33,13 @@ const NewUserForm = () => {
                 startDate: new Date(),
                 gender: "",
                 isActive: true,
-                role: "usuario",
+                role: "user",
             });
             setError(null);
             window.location.reload()
 
         } catch (err) {
-            setError("Error al crear el usuario");
+            setError("Error al crear el user");
         }
     };
 
