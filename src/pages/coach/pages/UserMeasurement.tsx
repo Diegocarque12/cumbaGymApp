@@ -110,7 +110,7 @@ const UserMeasurement = () => {
             Cintura Inferior: ${measurement.lowerWaist} cm
             Muslo Izquierdo: ${measurement.leftThigh} cm
             Muslo Derecho: ${measurement.rightThigh} cm
-            IMC: ${bmi}`
+            `
 
         navigator.clipboard.writeText(message).then(() => {
             alert("Medidas copiadas al portapapeles")
@@ -146,7 +146,7 @@ const UserMeasurement = () => {
                                 <th className="border p-2 whitespace-nowrap">Cintura Inf (cm)</th>
                                 <th className="border p-2 whitespace-nowrap">Muslo Izq (cm)</th>
                                 <th className="border p-2 whitespace-nowrap">Muslo Der (cm)</th>
-                                <th className="border p-2 whitespace-nowrap">IMC</th>
+                                {/* <th className="border p-2 whitespace-nowrap">IMC</th> */}
                                 <th className="border p-2 whitespace-nowrap">Acciones</th>
                             </tr>
                         </thead>
@@ -164,7 +164,7 @@ const UserMeasurement = () => {
                                         <td className="border p-2 text-center">{measurement.lowerWaist}</td>
                                         <td className="border p-2 text-center">{measurement.leftThigh}</td>
                                         <td className="border p-2 text-center">{measurement.rightThigh}</td>
-                                        <td className="border p-2 text-center">{bmi.toFixed(2)}</td>
+                                        {/* <td className="border p-2 text-center">{bmi.toFixed(2)}</td> */}
                                         <td className="border p-2 text-center">
                                             <button
                                                 onClick={() => {
