@@ -21,7 +21,6 @@ const NewUserForm = () => {
             const { error } = await supabase.from("users").insert([newUser]);
             if (error) {
                 console.log(error);
-
                 throw new Error(error.message);
             }
             setNewUser({
@@ -139,16 +138,15 @@ const NewUserForm = () => {
                     </select>
                 </div>
                 <div>
-                    <label htmlFor="roles" className="block text-gray-700 text-sm font-bold mb-2">
+                    <label htmlFor="role" className="block text-gray-700 text-sm font-bold mb-2">
                         Roles:
                     </label>
                     <select
-                        id="roles"
-                        name="roles"
+                        id="role"
+                        name="role"
                         value={newUser.role}
                         onChange={handleInputChange}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                        multiple
                     >
                         <option value="user">Usuario</option>
                         <option value="admin">Administrador</option>
