@@ -65,7 +65,9 @@ const Users = () => {
 			const { data, error } = await supabase
 				.from("measurements")
 				.select("*")
-				.eq("userId", userId);
+				.eq("userId", userId)
+				.order("measurementDate", { ascending: false })
+				.limit(1);
 			if (error) {
 				throw new Error(error.message);
 			}

@@ -49,14 +49,14 @@ export interface Exercise {
 
 export interface Measurement {
   id: number;
-    userId: number;
-    leftArm: number;
-    rightArm: number;
-    upperWaist: number;
-    lowerWaist: number;
-    leftThigh: number;
-    rightThigh: number;
-    weight: number;
-    height: number;
-    measurementDate: Date;
+  userId: number;
+  leftArm: number;
+  rightArm: number;
+  upperWaist: number;
+  lowerWaist: number;
+  leftThigh: number;
+  rightThigh: number;
+  measurementDate: string;
+  weight: number;
+  height: number;
 }
