@@ -13,7 +13,6 @@ const RoutineList = () => {
 
   const fetchRoutines = async () => {
     const { data, error } = await supabase.from("routines").select("*");
-
     if (error) {
       console.error("Error fetching routines:", error);
     } else {

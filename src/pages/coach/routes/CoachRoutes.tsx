@@ -16,11 +16,13 @@ const CouchRoutes = () => {
       <Nav />
       <Routes>
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/routines" element={<Routines />} />
         <Route path="/exercises" element={<Exercises />} />
+        <Route path="/exercises/:exerciseId" element={<Exercises />} />
+        <Route path="/exercises/:exerciseId/edit" element={<Exercises />} />
         <Route path="/users" element={<Users />} />
         <Route path="/users/:userId/edit" element={<ShowUserData />} />
         <Route path="/users/:userId/measurements" element={<UserMeasurement />} />
+        <Route path="/routines" element={<Routines />} />
         <Route path="/routines/:routineId" element={<Routine />} />
         <Route path="/add-routine" element={<CreateRoutine />} />
         <Route path="/today-workout" element={<TodayWorkout />} />
