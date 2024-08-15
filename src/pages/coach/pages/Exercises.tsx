@@ -1,311 +1,174 @@
-import { useState, useEffect } from "react";
-import supabase from "../../../utils/supabaseClient";
-import type { Exercise } from "../../../../interfaces/types";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
+import supabase from "@/utils/supabaseClient";
+import { Exercise } from "interfaces/types";
+import { useEffect, useState } from "react";
+import ExerciseList from "../components/exercise/ExerciseList";
+import ExerciseForm from "../components/exercise/ExerciseForm";
+import ExerciseDetails from "../components/exercise/ExerciseDetails";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 const Exercises = () => {
     const [exercises, setExercises] = useState<Exercise[]>([]);
-    const [selectedExercise, setSelectedExercise] = useState<Exercise>({
-        id: 0,
-        name: "",
-        description: "",
-        category: "",
-        target_muscle: "",
-        equipment: "",
-        difficulty: "",
-        instructions: "",
-        video_url: "",
-        image_url: "",
-    });
-    const [newExercise, setNewExercise] = useState<Exercise>({
-        id: 0,
-        name: "",
-        description: "",
-        category: "",
-        target_muscle: "",
-        equipment: "",
-        difficulty: "",
-        instructions: "",
-        video_url: "",
-        image_url: "",
-    });
-    const [isLoading, setIsLoading] = useState(true);
+    const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [isViewing, setIsViewing] = useState(false);
+    const [selectedExerciseId, setSelectedExerciseId] = useState<number | null>(null);
+
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         fetchExercises();
     }, []);
 
-    const fetchExercises = async () => {
+    const handleCreate = () => {
+        setSelectedExerciseId(null);
+        setSelectedExercise(null);
+        setIsEditing(true);
+    };
+
+    const handleEdit = (exercise: Exercise) => {
+        setSelectedExerciseId(exercise.id);
+        setSelectedExercise(exercise);
+        setIsEditing(true);
+    };
+
+    const handleView = (exercise: Exercise) => {
+        setSelectedExercise(exercise);
+        setIsViewing(true);
+    };
+
+    const handleSubmit = async (exercise: Exercise) => {
         try {
-            const { data, error } = await supabase.from("exercises").select("*");
-
-            if (error) {
-                throw new Error(error.message);
+            if (selectedExerciseId) {
+                await updateExercise(exercise);
+            } else {
+                await createExercise(exercise);
             }
+            setIsEditing(false);
+            fetchExercises();
+        } catch (error) {
+            console.error('Failed to submit exercise:', error);
+        }
+    };
 
+    const createExercise = async (exercise: Exercise) => {
+        console.log('Creating exercise:', exercise);
+
+        const { data, error } = await supabase.from('exercises').insert(exercise).select();
+        if (error) throw error;
+        if (!data) throw new Error('No data returned from insert operation');
+        return data[0] as Exercise;
+    };
+
+    const updateExercise = async (exercise: Exercise) => {
+        const { data, error } = await supabase
+            .from('exercises')
+            .update({ ...exercise, id: String(selectedExerciseId) })
+            .eq('id', String(selectedExerciseId)).select();
+        if (error) console.log(error);
+        if (!data) throw new Error('No data returned from update operation');
+        return data[0] as Exercise;
+    };
+
+    const handleDelete = async (id: string) => {
+        try {
+            const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar este ejercicio?")
+            if (confirmDelete) {
+                await deleteExercise(id);
+                fetchExercises();
+            }
+        } catch (error) {
+            console.error('Failed to delete exercise:', error);
+        }
+    };
+
+    const deleteExercise = async (id: string) => {
+        const { error } = await supabase.from('exercises').delete().eq('id', id);
+        if (error) throw error;
+    };
+
+    const fetchExercises = async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const { data, error } = await supabase.from('exercises').select('*');
+            if (error) throw error;
             setExercises(data as Exercise[]);
         } catch (err) {
-            setError("Error al obtener los ejercicios");
+            setError('Failed to fetch exercises');
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handleExerciseClick = (exercise: Exercise) => {
-        setSelectedExercise(exercise);
-    };
+    const [searchTerm, setSearchTerm] = useState('');
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        setNewExercise((prevExercise) => ({
-            ...prevExercise,
-            [name]: value,
-        }));
-    };
-
-    const handleCreateExercise = async () => {
-        try {
-            const { data, error } = await supabase.from("exercises").insert([newExercise]);
-
-            if (error) {
-                throw new Error(error.message);
-            }
-
-            setExercises((prevExercises) => [...prevExercises, ...(data ?? [])]);
-            setNewExercise({
-                id: 0,
-                name: "",
-                description: "",
-                category: "",
-                target_muscle: "",
-                equipment: "",
-                difficulty: "",
-                instructions: "",
-                video_url: "",
-                image_url: "",
-            });
-        } catch (err) {
-            setError("Error al crear el ejercicio");
-        }
-    };
-
-    if (isLoading) {
-        return <div>Cargando...</div>;
-    }
-
-    if (error) {
-        return <div>{error}</div>;
-    }
+    const filteredExercises = exercises.filter(exercise =>
+        exercise.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 container">
-            <h1 className="text-3xl font-bold mb-8">Ejercicios</h1>
-            <div className="mb-8">
-                <Dialog>
-                    <DialogTrigger>
-                        <button
-                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                        >
-                            Agregar Ejercicio
-                        </button>
-                    </DialogTrigger>
-                    <DialogContent className="bg-white rounded-xl shadow-xl max-w-3xl overflow-y-scroll max-h-screen">
-                        <DialogHeader>
-                            <DialogTitle>Agregar Ejercicio</DialogTitle>
-                            <DialogDescription>
-                                <div className="mt-4 space-y-4">
-                                    <div>
-                                        <label htmlFor="name" className="block mb-1">
-                                            Nombre:
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="name"
-                                            value={newExercise.name}
-                                            onChange={handleInputChange}
-                                            className="w-full px-2 py-1 border border-gray-300 rounded"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="description" className="block mb-1">
-                                            Descripción:
-                                        </label>
-                                        <textarea
-                                            name="description"
-                                            value={newExercise.description}
-                                            onChange={handleInputChange}
-                                            className="w-full px-2 py-1 border border-gray-300 rounded"
-                                        ></textarea>
-                                    </div>
-                                    <div>
-                                        <label htmlFor="category" className="block mb-1">
-                                            Categoría:
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="category"
-                                            value={newExercise.category}
-                                            onChange={handleInputChange}
-                                            className="w-full px-2 py-1 border border-gray-300 rounded"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="target_muscle" className="block mb-1">
-                                            Músculo objetivo:
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="target_muscle"
-                                            value={newExercise.target_muscle}
-                                            onChange={handleInputChange}
-                                            className="w-full px-2 py-1 border border-gray-300 rounded"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="equipment" className="block mb-1">
-                                            Equipo:
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="equipment"
-                                            value={newExercise.equipment}
-                                            onChange={handleInputChange}
-                                            className="w-full px-2 py-1 border border-gray-300 rounded"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="difficulty" className="block mb-1">
-                                            Dificultad:
-                                        </label>
-                                        <select
-                                            name="difficulty"
-                                            value={newExercise.difficulty}
-                                            onChange={handleInputChange}
-                                            className="w-full px-2 py-1 border border-gray-300 rounded"
-                                        >
-                                            <option value="">Selecciona una dificultad</option>
-                                            <option value="principiante">Principiante</option>
-                                            <option value="intermedio">Intermedio</option>
-                                            <option value="avanzado">Avanzado</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label htmlFor="instructions" className="block mb-1">
-                                            Instrucciones:
-                                        </label>
-                                        <textarea
-                                            name="instructions"
-                                            value={newExercise.instructions}
-                                            onChange={handleInputChange}
-                                            className="w-full px-2 py-1 border border-gray-300 rounded"
-                                        ></textarea>
-                                    </div>
-                                    <div>
-                                        <label htmlFor="video_url" className="block mb-1">
-                                            URL del video:
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="video_url"
-                                            value={newExercise.video_url}
-                                            onChange={handleInputChange}
-                                            className="w-full px-2 py-1 border border-gray-300 rounded"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="image_url" className="block mb-1">
-                                            URL de la imagen:
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="image_url"
-                                            value={newExercise.image_url}
-                                            onChange={handleInputChange}
-                                            className="w-full px-2 py-1 border border-gray-300 rounded"
-                                        />
-                                    </div>
-                                    <button
-                                        onClick={handleCreateExercise}
-                                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                                    >
-                                        Crear Ejercicio
-                                    </button>
-                                </div>
-                            </DialogDescription>
-                        </DialogHeader>
-                    </DialogContent>
-                </Dialog>
+        <div className="container mx-auto px-4 py-8">
+            <h1 className="text-3xl font-bold mb-6">Ejercicios</h1>
+            <div className="flex flex-col gap-4 md:flex-row md:gap-0 justify-between items-center mb-6">
+                <button
+                    onClick={handleCreate}
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 w-full md:w-auto"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                    </svg>
+
+                    Agregar Ejercicio
+                </button>
+                <input
+                    type="text"
+                    placeholder="Buscar ejercicio"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="border w-full rounded py-2 px-3 md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <div className="bg-white shadow-md rounded-lg p-6">
-                            <h2 className="text-2xl font-bold mb-6 text-gray-800">Lista de Ejercicios</h2>
-                            <ul className="space-y-4">
-                                {exercises.map((exercise) => (
-                                    <li
-                                        key={exercise.id}
-                                        className="cursor-pointer hover:bg-gray-100 p-4 rounded transition duration-300 ease-in-out border border-gray-200"
-                                        onClick={() => handleExerciseClick(exercise)}
-                                    >
-                                        <span className="text-lg text-gray-700">{exercise.name}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    </DialogTrigger>
-                    <DialogContent className="bg-white rounded-xl shadow-xl max-w-3xl overflow-y-scroll max-h-screen">
+            {isLoading ? (
+                <div className="flex justify-center items-center h-64">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+                </div>
+            ) : error ? (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <strong className="font-bold">Error!</strong>
+                    <span className="block sm:inline"> {error}</span>
+                </div>
+            ) : (
+                <ExerciseList
+                    exercises={filteredExercises}
+                    onView={handleView}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                />
+            )}
+            {isEditing && (
+                <Dialog open={isEditing} onOpenChange={(open) => setIsEditing(open)}>
+                    <DialogContent className="max-w-3xl overflow-y-scroll max-h-screen">
                         <DialogHeader>
-                            <DialogTitle className="text-2xl font-bold text-gray-800 mb-4">Detalles del Ejercicio</DialogTitle>
-                            <DialogDescription>
-                                <div className="space-y-6 p-6 bg-gray-50 rounded-lg shadow-inner">
-                                    <p className="text-lg flex items-center">
-                                        <strong className="font-semibold text-gray-700 w-1/3">Nombre:</strong> <span className="text-gray-600 w-2/3">{selectedExercise.name}</span>
-                                    </p>
-                                    <p className="text-lg flex items-start">
-                                        <strong className="font-semibold text-gray-700 w-1/3">Descripción:</strong> <span className="text-gray-600 w-2/3">{selectedExercise.description}</span>
-                                    </p>
-                                    <p className="text-lg flex items-center">
-                                        <strong className="font-semibold text-gray-700 w-1/3">Categoría:</strong> <span className="text-gray-600 w-2/3">{selectedExercise.category}</span>
-                                    </p>
-                                    <p className="text-lg flex items-center">
-                                        <strong className="font-semibold text-gray-700 w-1/3">Músculo objetivo:</strong> <span className="text-gray-600 w-2/3">{selectedExercise.target_muscle}</span>
-                                    </p>
-                                    <p className="text-lg flex items-center">
-                                        <strong className="font-semibold text-gray-700 w-1/3">Equipo:</strong> <span className="text-gray-600 w-2/3">{selectedExercise.equipment}</span>
-                                    </p>
-                                    <p className="text-lg flex items-center">
-                                        <strong className="font-semibold text-gray-700 w-1/3">Dificultad:</strong> <span className="text-gray-600 w-2/3">{selectedExercise.difficulty}</span>
-                                    </p>
-                                    <div className="text-lg flex items-start">
-                                        <strong className="font-semibold text-gray-700 w-1/3">Instrucciones:</strong> <span className="text-gray-600 w-2/3">{selectedExercise.instructions}</span>
-                                    </div>
-                                    {selectedExercise.video_url && (
-                                        <div className="mt-8 bg-white p-4 rounded-lg shadow-md">
-                                            <h3 className="text-xl font-bold mb-4 text-gray-800 border-b pb-2">Video demostrativo</h3>
-                                            <video src={selectedExercise.video_url} controls className="w-full rounded-lg shadow-sm"></video>
-                                        </div>
-                                    )}
-                                    {selectedExercise.image_url && (
-                                        <div className="mt-8 bg-white p-4 rounded-lg shadow-md">
-                                            <h3 className="text-xl font-bold mb-4 text-gray-800 border-b pb-2">Imagen ilustrativa</h3>
-                                            <img src={selectedExercise.image_url} alt={selectedExercise.name} className="w-full rounded-lg shadow-sm" />
-                                        </div>
-                                    )}
-                                </div>
-                            </DialogDescription>
+                            <DialogTitle>Editar Ejercicio</DialogTitle>
                         </DialogHeader>
+                        <DialogDescription>
+                            <ExerciseForm
+                                exercise={selectedExercise}
+                                onSubmit={handleSubmit}
+                                onCancel={() => setIsEditing(false)}
+                            />
+                        </DialogDescription>
                     </DialogContent>
-                </Dialog>
-            </div>
+                </Dialog>)}
+            {isViewing && selectedExercise && (
+                <ExerciseDetails
+                    exercise={selectedExercise}
+                    onClose={() => setIsViewing(false)}
+                    open={isViewing}
+                />
+            )}
         </div>
     );
 };
