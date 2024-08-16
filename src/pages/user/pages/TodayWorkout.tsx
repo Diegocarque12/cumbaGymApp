@@ -43,7 +43,7 @@ const TodayWorkout = () => {
             const { data: exerciseSetsData, error: exerciseSetsError } = await supabase
                 .from("exercisesets")
                 .select("*")
-                .eq("routineid", routineId);
+                .eq("routineId", routineId);
 
             if (exerciseSetsError) {
                 throw new Error(exerciseSetsError.message);

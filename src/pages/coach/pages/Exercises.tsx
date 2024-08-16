@@ -154,12 +154,12 @@ const Exercises = () => {
                             <DialogTitle>Editar Ejercicio</DialogTitle>
                         </DialogHeader>
                         <DialogDescription>
-                            <ExerciseForm
-                                exercise={selectedExercise}
-                                onSubmit={handleSubmit}
-                                onCancel={() => setIsEditing(false)}
-                            />
                         </DialogDescription>
+                        <ExerciseForm
+                            exercise={selectedExercise}
+                            onSubmit={handleSubmit}
+                            onCancel={() => setIsEditing(false)}
+                        />
                     </DialogContent>
                 </Dialog>)}
             {isViewing && selectedExercise && (

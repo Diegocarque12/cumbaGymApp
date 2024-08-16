@@ -78,18 +78,17 @@ const ShowUserData = () => {
 
         const { error } = await supabase
             .from('userroutines')
-            .insert({ routineid: newRoutine.id, userId: userId });
+            .insert({ routineId: newRoutine.id, userId: userId });
         if (error) console.error('Error adding routine:', error);
         else fetchUserRoutines();
     };
 
     const removeRoutine = async (routineId: string) => {
-        console.log(routineId);
-
         const { error } = await supabase
             .from('userroutines')
             .delete()
-            .eq('routineid', routineId);
+            .eq('routineId', routineId)
+            .eq('userId', userId);
         if (error) console.error('Error removing routine:', error);
         else fetchUserRoutines();
     };

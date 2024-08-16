@@ -9,7 +9,7 @@ export interface User {
   gender: string;
   isActive: boolean;
   deletedAt?: Date;
-  role: 'user' | 'coach' | 'admin';
+  role: "user" | "coach" | "admin";
 }
 
 export interface Routine {
@@ -26,6 +26,7 @@ export interface UserRoutine {
 
 export interface ExerciseSet {
   id: number;
+  exercises?: { name: string };
   routineId: number;
   exerciseId: number;
   setnumber: number;
@@ -35,16 +36,16 @@ export interface ExerciseSet {
 }
 
 export interface Exercise {
-    id: number;
-    name: string;
-    description: string;
-    category: string;
-    target_muscle: string;
-    equipment: string;
-    difficulty: string;
-    instructions: string;
-    video_url: string;
-    image_url: string;
+  id: number;
+  name: string;
+  description: string;
+  category: string;
+  target_muscle: string;
+  equipment: string;
+  difficulty: string;
+  instructions: string;
+  video_url: string;
+  image_url: string;
 }
 
 export interface Measurement {
