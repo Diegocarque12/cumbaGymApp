@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import Routines from "../pages/Routines";
 import Nav from "../../../ui/AdminNav";
-import Routine from "../pages/Routine";
+import Routine from "../pages/RoutineDetails";
 import CreateRoutine from "../pages/CreateRoutine";
 import TodayWorkout from "../pages/TodayWorkout";
 import Exercises from "../pages/Exercises";
