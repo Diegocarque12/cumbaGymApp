@@ -6,7 +6,7 @@ export function useSessionStorage<T>(key: string, initialValue: T) {
       const item = sessionStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      console.log(error);
+      console.error("error in custom hook sessionStorage", error);
       return initialValue;
     }
   });
@@ -15,7 +15,7 @@ export function useSessionStorage<T>(key: string, initialValue: T) {
     try {
       sessionStorage.setItem(key, JSON.stringify(storedValue));
     } catch (error) {
-      console.log(error);
+      console.error("error in custom hook sessionStorage", error);
     }
   }, [key, storedValue]);
 

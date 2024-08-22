@@ -26,7 +26,6 @@ const UserDashboard = () => {
                     navigate("/login");
                     return;
                 }
-
                 const { data: userData, error: userError } = await supabase
                     .from("users")
                     .select("*")
@@ -36,12 +35,9 @@ const UserDashboard = () => {
                 if (userError) {
                     throw new Error(userError.message);
                 }
-
                 setUser(userData);
-                console.log(userData);
-
             } catch (err) {
-                console.log("Error al obtener los datos del usuario");
+                console.error("Error al obtener los datos del usuario");
             } finally {
                 setIsLoading(false);
             }

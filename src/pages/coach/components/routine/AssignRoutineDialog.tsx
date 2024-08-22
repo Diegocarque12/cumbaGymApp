@@ -42,8 +42,6 @@ const AssignRoutineDialog = ({ routineId }: AssignRoutineDialogProps) => {
             setUsers(userlist);
         };
         fetchUsers();
-        console.log(users);
-
     }, [])
 
     const assignRoutineMutation = useMutation(
@@ -70,13 +68,6 @@ const AssignRoutineDialog = ({ routineId }: AssignRoutineDialogProps) => {
             assignRoutineMutation.mutate({ userId: selectedUserId, routineId });
         }
     };
-
-    // if (isLoading) return <div>Loading...</div>;
-    // if (error) return <div>Error fetching users</div>;
-    console.log('Raw users data:', users);
-    console.log('Filtered users:', filteredUsers);
-    console.log('Users type:', typeof users, Array.isArray(users));
-
 
     return (
         <Dialog>

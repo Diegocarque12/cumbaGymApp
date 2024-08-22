@@ -94,7 +94,7 @@ export default function RoutineDetails() {
     deleteExerciseSet(id);
   }, []);
 
-  const deleteRoutine = async (currentRoutineId: string) => {
+  const deleteRoutine = async (currentRoutineId: number) => {
     try {
       const { error } = await supabase.from("routines").delete().eq("id", currentRoutineId);
       if (error) throw error;

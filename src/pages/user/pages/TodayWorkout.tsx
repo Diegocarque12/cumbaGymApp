@@ -16,12 +16,6 @@ const TodayWorkout = () => {
         fetchRoutines();
     }, []);
 
-    useEffect(() => {
-        console.log(exerciseSets);
-        console.log(completedSets);
-    }, [exerciseSets, completedSets]);
-
-
     const fetchRoutines = async () => {
         try {
             const { data: routinesData, error: routinesError } = await supabase.from("routines").select("*");

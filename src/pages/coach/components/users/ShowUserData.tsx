@@ -74,8 +74,6 @@ const ShowUserData = () => {
     };
 
     const addRoutine = async (newRoutine: Routine) => {
-        console.log(newRoutine);
-
         const { error } = await supabase
             .from('userroutines')
             .insert({ routineId: newRoutine.id, userId: userId });

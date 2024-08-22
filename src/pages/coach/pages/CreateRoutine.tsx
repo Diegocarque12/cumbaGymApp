@@ -81,8 +81,6 @@ const CreateRoutine = () => {
 
 
   const handleUpdateRoutine = async (routineId: number) => {
-    console.log(routineId);
-
     try {
       const { data, error } = await supabase
         .from("routines")
@@ -95,8 +93,6 @@ const CreateRoutine = () => {
       }
 
       if (data && data.length > 0) {
-        console.log(data);
-
         setRoutines((prevRoutines) =>
           prevRoutines.map((routine) =>
             routine.id === routineId ? data[0] : routine

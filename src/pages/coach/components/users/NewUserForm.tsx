@@ -20,7 +20,7 @@ const NewUserForm = () => {
         try {
             const { error } = await supabase.from("users").insert([newUser]);
             if (error) {
-                console.log(error);
+                console.error('Error in newUserForm', error);
                 throw new Error(error.message);
             }
             setNewUser({

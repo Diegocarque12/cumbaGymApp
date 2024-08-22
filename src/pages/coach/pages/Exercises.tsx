@@ -53,8 +53,6 @@ const Exercises = () => {
     };
 
     const createExercise = async (exercise: Exercise) => {
-        console.log('Creating exercise:', exercise);
-
         const { data, error } = await supabase.from('exercises').insert(exercise).select();
         if (error) throw error;
         if (!data) throw new Error('No data returned from insert operation');
@@ -66,7 +64,7 @@ const Exercises = () => {
             .from('exercises')
             .update({ ...exercise, id: String(selectedExerciseId) })
             .eq('id', String(selectedExerciseId)).select();
-        if (error) console.log(error);
+        if (error) console.error('Error in updateExercise', error);
         if (!data) throw new Error('No data returned from update operation');
         return data[0] as Exercise;
     };
