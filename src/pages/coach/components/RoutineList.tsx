@@ -31,12 +31,11 @@ const RoutineList = () => {
           Crear Rutina
         </Link>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="flex flex-wrap gap-8">
         {routineList.map((routine) => (
           <Link
             key={routine.id}
             to={`/coach/routines/${routine.id}`}
-            className="hover:shadow-lg transition duration-300"
           >
             <Card name={routine.name} description={routine.description} />
           </Link>

@@ -94,6 +94,18 @@ export default function RoutineDetails() {
     deleteExerciseSet(id);
   }, []);
 
+  const deleteRoutine = async (currentRoutineId: string) => {
+    try {
+      const { error } = await supabase.from("routines").delete().eq("id", currentRoutineId);
+      if (error) throw error;
+      toast.success("Routine deleted successfully");
+      window.location.href = "/coach/routines";
+    } catch (error) {
+      toast.error(`Error deleting routine: ${(error as Error).message}`);
+    }
+  };
+
+
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -114,7 +126,24 @@ export default function RoutineDetails() {
   return (
     <ErrorBoundary>
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Rutina: {routine?.name}</h1>
+        <div className="flex justify-between mb-6">
+          <h1 className="text-3xl font-bold mb-8">Rutina: {routine?.name}</h1>
+          <Button
+            variant="destructive"
+            onClick={() => {
+              if (window.confirm("¿Estás seguro de que quieres eliminar esta rutina?")) {
+                // Add the delete routine logic here
+                // For example:
+                deleteRoutine(currentRoutineId)
+              }
+            }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Eliminar Rutina
+          </Button>
+        </div>
         <div className="flex justify-between mb-6">
           <AssignRoutineDialog routineId={currentRoutineId} />
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
