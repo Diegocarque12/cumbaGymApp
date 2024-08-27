@@ -80,12 +80,12 @@ const CreateRoutine = () => {
   };
 
 
-  const handleUpdateRoutine = async (routineId: number) => {
+  const handleUpdateRoutine = async (routine_id: number) => {
     try {
       const { data, error } = await supabase
         .from("routines")
         .update({ name: editingRoutine.name, description: editingRoutine.description })
-        .eq("id", routineId)
+        .eq("id", routine_id)
         .select();
 
       if (error) {
@@ -95,7 +95,7 @@ const CreateRoutine = () => {
       if (data && data.length > 0) {
         setRoutines((prevRoutines) =>
           prevRoutines.map((routine) =>
-            routine.id === routineId ? data[0] : routine
+            routine.id === routine_id ? data[0] : routine
           )
         );
         setNewRoutine({ id: 0, name: "", description: "" });
@@ -111,14 +111,14 @@ const CreateRoutine = () => {
 
 
 
-  const handleDeleteRoutine = async (routineId: number) => {
+  const handleDeleteRoutine = async (routine_id: number) => {
     try {
-      const { error } = await supabase.from("routines").delete().eq("id", routineId);
+      const { error } = await supabase.from("routines").delete().eq("id", routine_id);
       if (error) {
         throw new Error(error.message);
       }
       setRoutines((prevRoutines) =>
-        prevRoutines.filter((routine) => routine.id !== routineId)
+        prevRoutines.filter((routine) => routine.id !== routine_id)
       );
     } catch (err) {
       setError("Error al eliminar la rutina");

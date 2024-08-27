@@ -12,7 +12,7 @@ const CouchRoutes = () => {
                 {/* <Route path="/routines" element={<Routines />} />
                 <Route path="/exercises" element={<Exercises />} />
                 <Route path="/users" element={<Users />} />
-                <Route path="/routines/:routineId" element={<Routine />} /> */}
+                <Route path="/routines/:routine_id" element={<Routine />} /> */}
                 {/* <Route path="/add-routine" element={<CreateRoutine />} /> */}
                 <Route path="/today-workout" element={<TodayWorkout />} />
                 <Route path="/" element={<Navigate to="user/dashboard" replace />} />

@@ -1,14 +1,14 @@
 export interface User {
   id?: number;
-  nationalId: string;
+  national_id: string;
   name: string;
-  lastName: string;
+  last_name: string;
   age: number;
   goal?: string;
-  startDate: Date;
+  start_date: Date;
   gender: string;
-  isActive: boolean;
-  deletedAt?: Date;
+  is_active: boolean;
+  deleted_at?: Date;
   role: "user" | "coach" | "admin";
 }
 
@@ -20,19 +20,8 @@ export interface Routine {
 
 export interface UserRoutine {
   id: number;
-  userId: number;
-  routineId: number;
-}
-
-export interface ExerciseSet {
-  id: number;
-  exercises?: { name: string };
-  routineId: number;
-  exerciseId: number;
-  setnumber: number;
-  weight: number;
-  repetitions: number;
-  exerciseName?: string;
+  routine_id: number;
+  user_id: number;
 }
 
 export interface Exercise {
@@ -48,16 +37,47 @@ export interface Exercise {
   image_url: string;
 }
 
-export interface Measurement {
+export interface UserMeasurement {
   id: number;
-  userId: number;
-  leftArm: number;
-  rightArm: number;
-  upperWaist: number;
-  lowerWaist: number;
-  leftThigh: number;
-  rightThigh: number;
-  measurementDate: string;
+  user_id: number;
+  left_arm: number;
+  right_arm: number;
+  upper_waist: number;
+  lower_waist: number;
+  left_thigh: number;
+  right_thigh: number;
+  measurement_date: string;
   weight: number;
   height: number;
+}
+
+export interface RoutineExercise {
+  id: number;
+  weight_type_id: number;
+  routine_id: number;
+  exercise_id: number;
+}
+
+export interface RoutineExerciseSet {
+  id?: number;
+  routine_exercise_id: number;
+  set_number: number;
+  suggested_weight: number;
+  suggested_repetitions: number;
+}
+
+export interface WeightTypes {
+  1: "kg";
+  2: "lbs";
+  3: "pesas";
+}
+
+export interface WorkoutHistory {
+  id: number;
+  user_id: number;
+  routine_exercise_id: number;
+  weight: number;
+  repetitions: number;
+  set_number: number;
+  date_completed: Date;
 }

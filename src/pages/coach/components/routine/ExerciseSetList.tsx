@@ -1,65 +1,109 @@
+import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import ExerciseSetForm from './ExerciseSetForm';
-import { Exercise, ExerciseSet } from "interfaces/types";
-import { memo, useState } from "react";
+import { Exercise, RoutineExercise, RoutineExerciseSet } from "interfaces/types";
 
 interface ExerciseSetListProps {
-    exerciseSets: ExerciseSet[];
+    routineExercises: RoutineExercise[];
+    routineExerciseSets: RoutineExerciseSet[];
     exercises: Exercise[];
-    onUpdate: (updatedSet: ExerciseSet) => void;
+    onUpdate: (updatedSet: RoutineExerciseSet) => void;
     onDelete: (id: number) => void;
-    routineId: number;
+    onAdd: (routineExerciseId: number) => void;
+    routine_id: number;
 }
 
-const ExerciseSetList = ({ exerciseSets, exercises, onUpdate, onDelete, routineId }: ExerciseSetListProps) => {
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
+const ExerciseSetList = ({
+    routineExercises,
+    routineExerciseSets,
+    exercises,
+    onUpdate,
+    onDelete,
+    onAdd,
+}: ExerciseSetListProps) => {
+    const [editingSet, setEditingSet] = useState<RoutineExerciseSet | null>(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [isAddingNew, setIsAddingNew] = useState(false);
+
+    useEffect(() => {
+        console.log("editingSet:", editingSet);
+    }, [editingSet])
 
     return (
-        <table className="w-full border-collapse">
-            <thead>
-                <tr className="bg-gray-200">
-                    <th className="px-4 py-2">Ejercicio</th>
-                    <th className="px-4 py-2">Serie</th>
-                    <th className="px-4 py-2">Peso</th>
-                    <th className="px-4 py-2">Repeticiones</th>
-                    <th className="px-4 py-2">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {exerciseSets.map((set) => (
-                    <tr key={set.id} className="border-t">
-                        <td className="px-4 py-2 text-center">{exercises.find(e => e.id === set.exerciseId)?.name}</td>
-                        <td className="px-4 py-2 text-center">{set.setnumber}</td>
-                        <td className="px-4 py-2 text-center">{set.weight}</td>
-                        <td className="px-4 py-2 text-center">{set.repetitions}</td>
-                        <td className="px-4 py-2 text-center">
-                            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                                <DialogTrigger asChild>
-                                    <Button variant="outline" className="mr-2">Editar</Button>
-                                </DialogTrigger>
-                                <DialogContent>
-                                    <DialogHeader>
-                                        <DialogTitle>Editar serie de ejercicio</DialogTitle>
-                                    </DialogHeader>
-                                    <ExerciseSetForm
-                                        exercises={exercises}
-                                        onSubmit={(updatedSet) => {
-                                            onUpdate({ ...updatedSet, id: set.id })
-                                            setIsDialogOpen(false);
-                                        }}
-                                        initialValues={set}
-                                        routineId={routineId}
-                                    />
-                                </DialogContent>
-                            </Dialog>
-                            <Button variant="destructive" onClick={() => onDelete(set.id)}>Eliminar</Button>
-                        </td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
+        <div>
+            {routineExercises.map((routineExercise) => {
+                const exercise = exercises.find(e => e.id === routineExercise.exercise_id);
+                const sets = routineExerciseSets.filter(set => set.routine_exercise_id === routineExercise.id);
+
+                return (
+                    <div key={routineExercise.id} className="mb-6 border p-4 rounded-lg">
+                        <h3 className="text-xl font-bold mb-2">{exercise?.name}</h3>
+                        <table className="w-full border-collapse">
+                            <thead>
+                                <tr className="bg-gray-100">
+                                    <th className="border p-2 text-left">Set</th>
+                                    <th className="border p-2 text-left">Suggested Weight</th>
+                                    <th className="border p-2 text-left">Suggested Repetitions</th>
+                                    <th className="border p-2 text-left">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {sets.map((set) => (
+                                    <tr key={set.id} className="hover:bg-gray-50">
+                                        <td className="border p-2">{set.set_number}</td>
+                                        <td className="border p-2">{set.suggested_weight}</td>
+                                        <td className="border p-2">{set.suggested_repetitions}</td>
+                                        <td className="border p-2">
+                                            <Dialog open={(editingSet?.id === set.id) || (isAddingNew && !set.id)}
+                                                onOpenChange={(open) => {
+                                                    if (!open) {
+                                                        setEditingSet(null);
+                                                        setIsAddingNew(false);
+                                                    }
+                                                }}
+                                            >
+                                                <DialogTrigger asChild>
+                                                    <Button variant="outline" className="mr-2" onClick={() => { setEditingSet(set); setIsEditing(true) }}>Edit</Button>
+                                                </DialogTrigger>
+                                                <DialogContent>
+                                                    <DialogHeader>
+                                                        <DialogTitle>Edit Exercise Set</DialogTitle>
+                                                    </DialogHeader>
+                                                    {editingSet && (
+                                                        <ExerciseSetForm
+                                                            onSubmit={(updatedSet: Omit<RoutineExerciseSet, "id">) => {
+                                                                onUpdate({ ...updatedSet, id: set.id, routine_exercise_id: set.routine_exercise_id, set_number: set.set_number } as RoutineExerciseSet);
+                                                                setEditingSet(null);
+                                                            }}
+                                                            initialValues={editingSet}
+                                                            isEditing={isEditing}
+                                                        />
+                                                    )}
+                                                </DialogContent>
+                                            </Dialog>
+                                            <Button variant="destructive" onClick={() => {
+                                                if (set.id) {
+                                                    onDelete(set.id)
+                                                }
+                                            }}>Delete</Button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                <tr>
+                                    <td colSpan={4}>
+                                        <Button className="w-full" onClick={() => onAdd(routineExercise.id)}>
+                                            Add Set
+                                        </Button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                );
+            })}
+        </div>
     );
 };
 
-export default memo(ExerciseSetList);
+export default ExerciseSetList;

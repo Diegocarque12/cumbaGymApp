@@ -8,32 +8,32 @@ La base de datos de CumbaGym está diseñada para almacenar y gestionar informac
 
 Esta tabla almacenará la información personal de los clientes.
 
-| Campo      | Tipo        | Descripción                                   |
-| ---------- | ----------- | --------------------------------------------- |
-| id         | SERIAL      | Clave primaria                                |
-| nationalId | VARCHAR(20) | Identificador nacional único (no nulo, único) |
-| name       | VARCHAR(50) | Nombre (no nulo)                              |
-| lastName   | VARCHAR(50) | Apellido (no nulo)                            |
-| age        | INT         | Edad (no nulo)                                |
-| goal       | TEXT        | Objetivo                                      |
-| startDate  | DATE        | Fecha de inicio (no nulo)                     |
-| gender     | VARCHAR(10) | Género (no nulo)                              |
+| Campo       | Tipo        | Descripción                                   |
+| ----------- | ----------- | --------------------------------------------- |
+| id          | SERIAL      | Clave primaria                                |
+| national_id | VARCHAR(20) | Identificador nacional único (no nulo, único) |
+| name        | VARCHAR(50) | Nombre (no nulo)                              |
+| last_name   | VARCHAR(50) | Apellido (no nulo)                            |
+| age         | INT         | Edad (no nulo)                                |
+| goal        | TEXT        | Objetivo                                      |
+| start_date  | DATE        | Fecha de inicio (no nulo)                     |
+| gender      | VARCHAR(10) | Género (no nulo)                              |
 
 ### Tabla Measurements
 
 Esta tabla almacenará las medidas corporales de los clientes registradas por el entrenador.
 
-| Campo           | Tipo   | Descripción                                                  |
-| --------------- | ------ | ------------------------------------------------------------ |
-| id              | SERIAL | Clave primaria                                               |
-| userId          | INT    | Clave foránea que hace referencia a la tabla Users (no nulo) |
-| leftArm         | FLOAT  | Medida del brazo izquierdo                                   |
-| rightArm        | FLOAT  | Medida del brazo derecho                                     |
-| upperWaist      | FLOAT  | Medida de la cintura superior                                |
-| lowerWaist      | FLOAT  | Medida de la cintura inferior                                |
-| leftThigh       | FLOAT  | Medida del muslo izquierdo                                   |
-| rightThigh      | FLOAT  | Medida del muslo derecho                                     |
-| measurementDate | DATE   | Fecha de la medición (no nulo)                               |
+| Campo            | Tipo   | Descripción                                                  |
+| ---------------- | ------ | ------------------------------------------------------------ |
+| id               | SERIAL | Clave primaria                                               |
+| user_id          | INT    | Clave foránea que hace referencia a la tabla Users (no nulo) |
+| left_arm         | FLOAT  | Medida del brazo izquierdo                                   |
+| right_arm        | FLOAT  | Medida del brazo derecho                                     |
+| upper_waist      | FLOAT  | Medida de la cintura superior                                |
+| lower_waist      | FLOAT  | Medida de la cintura inferior                                |
+| left_thigh       | FLOAT  | Medida del muslo izquierdo                                   |
+| right_thigh      | FLOAT  | Medida del muslo derecho                                     |
+| measurement_date | DATE   | Fecha de la medición (no nulo)                               |
 
 ### Tabla Routines
 
@@ -51,7 +51,7 @@ Esta tabla almacenará los conjuntos de ejercicios dentro de cada rutina.
 | Campo       | Tipo         | Descripción                                                     |
 | ----------- | ------------ | --------------------------------------------------------------- |
 | id          | SERIAL       | Clave primaria                                                  |
-| routineId   | INT          | Clave foránea que hace referencia a la tabla Routines (no nulo) |
+| routine_id  | INT          | Clave foránea que hace referencia a la tabla Routines (no nulo) |
 | machineName | VARCHAR(100) | Nombre de la máquina o ejercicio (no nulo)                      |
 | setNumber   | INT          | Número de serie o orden (no nulo)                               |
 | weight      | FLOAT        | Peso utilizado (no nulo)                                        |
@@ -61,13 +61,13 @@ Esta tabla almacenará los conjuntos de ejercicios dentro de cada rutina.
 
 Esta es una tabla de unión para establecer la relación muchos a muchos entre las tablas Users y Routines.
 
-| Campo     | Tipo   | Descripción                                                     |
-| --------- | ------ | --------------------------------------------------------------- |
-| id        | SERIAL | Clave primaria                                                  |
-| userId    | INT    | Clave foránea que hace referencia a la tabla Users (no nulo)    |
-| routineId | INT    | Clave foránea que hace referencia a la tabla Routines (no nulo) |
+| Campo      | Tipo   | Descripción                                                     |
+| ---------- | ------ | --------------------------------------------------------------- |
+| id         | SERIAL | Clave primaria                                                  |
+| user_id    | INT    | Clave foránea que hace referencia a la tabla Users (no nulo)    |
+| routine_id | INT    | Clave foránea que hace referencia a la tabla Routines (no nulo) |
 
-La restricción `UNIQUE (userId, routineId)` garantiza que no haya duplicados en la combinación de `userId` y `routineId`.
+La restricción `UNIQUE (user_id, routine_id)` garantiza que no haya duplicados en la combinación de `user_id` y `routine_id`.
 
 ## Funcionalidades
 
@@ -85,26 +85,26 @@ A continuación, se muestra el código SQL para crear las tablas en la base de d
 -- Tabla Users
 CREATE TABLE Users (
     id SERIAL PRIMARY KEY,
-    nationalId VARCHAR(20) UNIQUE NOT NULL,
+    national_id VARCHAR(20) UNIQUE NOT NULL,
     name VARCHAR(50) NOT NULL,
-    lastName VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
     age INT NOT NULL,
     goal TEXT,
-    startDate DATE NOT NULL,
+    start_date DATE NOT NULL,
     gender VARCHAR(10) NOT NULL
 );
 
 -- Tabla Measurements
 CREATE TABLE Measurements (
     id SERIAL PRIMARY KEY,
-    userId INT NOT NULL REFERENCES Users(id),
-    leftArm FLOAT,
-    rightArm FLOAT,
-    upperWaist FLOAT,
-    lowerWaist FLOAT,
-    leftThigh FLOAT,
-    rightThigh FLOAT,
-    measurementDate DATE NOT NULL
+    user_id INT NOT NULL REFERENCES Users(id),
+    left_arm FLOAT,
+    right_arm FLOAT,
+    upper_waist FLOAT,
+    lower_waist FLOAT,
+    left_thigh FLOAT,
+    right_thigh FLOAT,
+    measurement_date DATE NOT NULL
 );
 
 -- Tabla Routines
@@ -116,7 +116,7 @@ CREATE TABLE Routines (
 -- Tabla ExerciseSets
 CREATE TABLE ExerciseSets (
     id SERIAL PRIMARY KEY,
-    routineId INT NOT NULL REFERENCES Routines(id),
+    routine_id INT NOT NULL REFERENCES Routines(id),
     machineName VARCHAR(100) NOT NULL,
     setNumber INT NOT NULL,
     weight FLOAT NOT NULL,
@@ -126,9 +126,9 @@ CREATE TABLE ExerciseSets (
 -- Tabla UserRoutines (tabla de unión)
 CREATE TABLE UserRoutines (
     id SERIAL PRIMARY KEY,
-    userId INT NOT NULL REFERENCES Users(id),
-    routineId INT NOT NULL REFERENCES Routines(id),
-    UNIQUE (userId, routineId)
+    user_id INT NOT NULL REFERENCES Users(id),
+    routine_id INT NOT NULL REFERENCES Routines(id),
+    UNIQUE (user_id, routine_id)
 );
 ```
 

@@ -11,7 +11,7 @@ const UserDashboard = () => {
         lastname: string;
         age: number;
         goal: string;
-        startDate: string;
+        start_date: string;
         gender: string;
         role: string;
         user_id_auth: string;

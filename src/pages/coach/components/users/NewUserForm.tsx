@@ -4,14 +4,14 @@ import { useState } from "react";
 
 const NewUserForm = () => {
     const [newUser, setNewUser] = useState<User>({
-        nationalId: "",
+        national_id: "",
         name: "",
-        lastName: "",
+        last_name: "",
         age: 0,
         goal: "",
-        startDate: new Date(),
+        start_date: new Date(),
         gender: "",
-        isActive: true,
+        is_active: true,
         role: "user",
     });
     const [error, setError] = useState<string | null>(null);
@@ -24,14 +24,14 @@ const NewUserForm = () => {
                 throw new Error(error.message);
             }
             setNewUser({
-                nationalId: "",
+                national_id: "",
                 name: "",
-                lastName: "",
+                last_name: "",
                 age: 0,
                 goal: "",
-                startDate: new Date(),
+                start_date: new Date(),
                 gender: "",
-                isActive: true,
+                is_active: true,
                 role: "user",
             });
             setError(null);
@@ -56,14 +56,14 @@ const NewUserForm = () => {
             {error && <p className="text-red-500 text-xs italic mb-4">{error}</p>}
             <div className="space-y-4">
                 <div>
-                    <label htmlFor="nationalId" className="block text-gray-700 text-sm font-bold mb-2">
+                    <label htmlFor="national_id" className="block text-gray-700 text-sm font-bold mb-2">
                         Cédula:
                     </label>
                     <input
                         type="text"
-                        id="nationalId"
-                        name="nationalId"
-                        value={newUser.nationalId}
+                        id="national_id"
+                        name="national_id"
+                        value={newUser.national_id}
                         onChange={handleInputChange}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     />
@@ -82,14 +82,14 @@ const NewUserForm = () => {
                     />
                 </div>
                 <div>
-                    <label htmlFor="lastName" className="block text-gray-700 text-sm font-bold mb-2">
+                    <label htmlFor="last_name" className="block text-gray-700 text-sm font-bold mb-2">
                         Apellido:
                     </label>
                     <input
                         type="text"
-                        id="lastName"
-                        name="lastName"
-                        value={newUser.lastName}
+                        id="last_name"
+                        name="last_name"
+                        value={newUser.last_name}
                         onChange={handleInputChange}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     />

@@ -32,21 +32,21 @@ const TodayWorkout = () => {
         }
     };
 
-    const fetchExerciseSets = async (routineId: number) => {
+    const fetchExerciseSets = async (routine_id: number) => {
         try {
-            const { data: exerciseSetsData, error: exerciseSetsError } = await supabase
-                .from("exercisesets")
+            const { data: routineExercisesData, error: exerciseSetsError } = await supabase
+                .from("routine_exercises")
                 .select("*")
-                .eq("routineId", routineId);
+                .eq("routine_id", routine_id);
 
             if (exerciseSetsError) {
                 throw new Error(exerciseSetsError.message);
             }
 
             const exerciseSetsWithNames = await Promise.all(
-                exerciseSetsData.map(async (exerciseSet) => {
-                    const exerciseName = await getExerciseName(exerciseSet.exerciseId);
-                    return { ...exerciseSet, exerciseName };
+                routineExercisesData.map(async (exerciseSet) => {
+                    const exercise_name = await getExerciseName(exerciseSet.exercise_id);
+                    return { ...exerciseSet, exercise_name };
                 })
             );
 
@@ -58,12 +58,12 @@ const TodayWorkout = () => {
     };
 
 
-    const getExerciseName = async (exerciseId: number) => {
+    const getExerciseName = async (exercise_id: number) => {
         try {
             const { data, error } = await supabase
                 .from("exercises")
                 .select("name")
-                .eq("id", exerciseId)
+                .eq("id", exercise_id)
                 .single();
 
             if (error) {
@@ -79,9 +79,9 @@ const TodayWorkout = () => {
 
 
     const handleRoutineChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const routineId = parseInt(event.target.value);
-        setSelectedRoutineId(routineId);
-        await fetchExerciseSets(routineId);
+        const routine_id = parseInt(event.target.value);
+        setSelectedRoutineId(routine_id);
+        await fetchExerciseSets(routine_id);
         setIsRoutineSelected(true);
     };
 
@@ -143,7 +143,7 @@ const TodayWorkout = () => {
                     <h3 className="text-xl font-semibold mb-2">Lista de Ejercicios</h3>
                     {exerciseSets.map((exerciseSet, exerciseIndex) => (
                         <div key={exerciseSet.id} className="mb-8">
-                            <h3 className="text-xl font-semibold mb-2">Ejercicio: {exerciseSet.exerciseName}</h3>
+                            <h3 className="text-xl font-semibold mb-2">Ejercicio: {exerciseSet.exercise_name}</h3>
                             {Array.from({ length: exerciseSet.setnumber }).map((_, setIndex) => (
                                 <div key={`${exerciseSet.id}-${setIndex}`} className="bg-gray-100 p-4 rounded-lg mb-4">
                                     <p className="text-lg font-medium mb-2">Set: {setIndex + 1}</p>

@@ -1,100 +1,124 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import supabase from "../../../utils/supabaseClient";
-import { Exercise, ExerciseSet, Routine } from "../../../../interfaces/types";
+import { Exercise, Routine, RoutineExercise, RoutineExerciseSet } from "../../../../interfaces/types";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "react-toastify";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import AssignRoutineDialog from "../components/routine/AssignRoutineDialog";
-import ExerciseSetForm from "../components/routine/ExerciseSetForm";
 import ExerciseSetList from "../components/routine/ExerciseSetList";
 
-const ITEMS_PER_PAGE = 10;
+// const ITEMS_PER_PAGE = 3;
 
 export default function RoutineDetails() {
-  const { routineId } = useParams<{ routineId: string }>();
-  const currentRoutineId = Number(routineId);
+  const { routine_id } = useParams<{ routine_id: string }>();
+  const currentRoutineId = Number(routine_id);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [routine, setRoutine] = useState<Routine | null>(null);
-  const [exerciseSets, setExerciseSets] = useState<ExerciseSet[]>([]);
+  const [routine, setRoutine] = useState<Routine>();
   const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [routineExercise, setRoutineExercise] = useState<RoutineExercise[]>([]);
+  const [routineExerciseSet, setRoutineExerciseSet] = useState<RoutineExerciseSet[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [page, setPage] = useState(1);
+  // const [page, setPage] = useState(1);
 
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
+  const fetchRoutine = async () => {
     try {
-      const [routineData, exerciseSetsData, exercisesData] = await Promise.all([
-        supabase.from("routines").select("*").eq("id", currentRoutineId).single(),
-        supabase.from("exercisesets").select("*, exercises(name)").eq("routineId", currentRoutineId),
-        supabase.from("exercises").select("*")
-      ]);
-
-      if (routineData.error) throw routineData.error;
-      if (exerciseSetsData.error) throw exerciseSetsData.error;
-      if (exercisesData.error) throw exercisesData.error;
-
-      setRoutine(routineData.data as Routine);
-      setExerciseSets(exerciseSetsData.data as ExerciseSet[]);
-      setExercises(exercisesData.data as Exercise[]);
+      const { data, error } = await supabase
+        .from("routines")
+        .select("*")
+        .eq("id", currentRoutineId)
+        .single();
+      if (data) {
+        setRoutine(data);
+      }
+      if (error) {
+        throw new Error(error.message);
+      }
     } catch (err) {
       setError(err as Error);
-    } finally {
-      setIsLoading(false);
     }
-  }, [currentRoutineId]);
+  }
+
+  const fetchRoutineExercise = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("routine_exercises")
+        .select("*")
+        .eq("routine_id", currentRoutineId);
+      if (data) {
+        setRoutineExercise(data);
+      }
+      if (error) {
+        throw new Error(error.message);
+      }
+    } catch (err) {
+      setError(err as Error);
+    }
+  }
+
+  const getAllRoutineIds = () => {
+    return routineExercise.map((routineExercise) => routineExercise.exercise_id.toString());
+  }
+
+  const fetchExercises = async () => {
+    console.log('getAllRoutineIds', getAllRoutineIds());
+    try {
+
+      const { data, error } = await supabase
+        .from("exercises")
+        .select("*")
+        .in("id", getAllRoutineIds()
+        );
+
+      if (data) {
+        setExercises(data);
+        console.log('fetchExercises', data);
+        setIsLoading(false);
+      }
+      if (error) {
+        throw new Error(error.message);
+      }
+    } catch (err) {
+      setError(err as Error);
+    }
+  }
+
+  const getAllRoutineExercisesIds = () => {
+    return routineExercise.map((routineExercise) => routineExercise.id.toString());
+  }
+
+  const fetchRoutineExerciseSet = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('routine_exercise_sets')
+        .select('*')
+        .in('routine_exercise_id', getAllRoutineExercisesIds());
+      if (data) {
+        setRoutineExerciseSet(data);
+        console.log('routineExerciseSet', routineExerciseSet);
+      }
+      if (error) {
+        throw new Error(error.message);
+      }
+    } catch (err) {
+      setError(err as Error);
+    }
+  }
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  const updateExerciseSet = async (updatedSet: ExerciseSet) => {
-    try {
-      const { error } = await supabase
-        .from("exercisesets")
-        .update(updatedSet)
-        .eq("id", updatedSet.id);
-      if (error) throw error;
-      toast.success("Exercise set updated successfully");
-      fetchData();
-    } catch (error) {
-      toast.error(`Error updating exercise set: ${(error as Error).message}`);
-    }
-  };
-
-  const handleExerciseSetUpdate = useCallback((updatedSet: ExerciseSet) => {
-    updateExerciseSet(updatedSet);
+    fetchRoutine();
+    fetchRoutineExercise();
   }, []);
 
-  const deleteExerciseSet = async (id: number) => {
-    try {
-      const { error } = await supabase.from("exercisesets").delete().eq("id", id);
-      if (error) throw error;
-      toast.success("Exercise set deleted successfully");
-      fetchData();
-    } catch (error) {
-      toast.error(`Error deleting exercise set: ${(error as Error).message}`);
-    }
-  };
+  useEffect(() => {
+    fetchExercises();
+    fetchRoutineExerciseSet();
+  }, [routineExercise])
 
-  const handleExerciseSetCreation = useCallback(async (newSet: Omit<ExerciseSet, "id">) => {
-    try {
-      const { error } = await supabase.from("exercisesets").insert(newSet);
-      if (error) throw error;
-      toast.success("Exercise set created successfully");
-      fetchData();
-    } catch (error) {
-      toast.error(`Error creating exercise set: ${(error as Error).message}`);
-    }
-  }, [fetchData]);
 
-  const handleExerciseSetDeletion = useCallback((id: number) => {
-    deleteExerciseSet(id);
-  }, []);
-
-  const deleteRoutine = async (currentRoutineId: number) => {
+  const deleteRoutine = async () => {
     try {
       const { error } = await supabase.from("routines").delete().eq("id", currentRoutineId);
       if (error) throw error;
@@ -105,6 +129,66 @@ export default function RoutineDetails() {
     }
   };
 
+  const updateRoutineName = async (newName: string) => {
+    try {
+      const { error } = await supabase.from("routines").update({ name: newName }).eq("id", currentRoutineId);
+      if (error) throw error;
+      toast.success("Routine name updated successfully");
+    } catch (error) {
+      toast.error(`Error updating routine name: ${(error as Error).message}`);
+    }
+  };
+
+  const handleExerciseSetUpdate = async (updatedSet: RoutineExerciseSet) => {
+    const updatedSets = routineExerciseSet.map(set =>
+      set.id === updatedSet.id ? updatedSet : set
+    );
+    setRoutineExerciseSet(updatedSets);
+    const { data, error } = await supabase.from('routine_exercise_sets').update(updatedSet).eq('id', updatedSet.id);
+    if (error) {
+      toast.error(`Error updating routine exercise set: ${error.message}`);
+    } else {
+      console.log(data);
+      toast.success('Routine exercise set updated successfully');
+    }
+  };
+
+  const handleExerciseSetDeletion = async (id: number) => {
+    try {
+      const { error } = await supabase
+        .from('routine_exercise_sets')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+      setRoutineExerciseSet(routineExerciseSet.filter(set => set.id !== id));
+      toast.success("Exercise set deleted successfully");
+    } catch (error) {
+      toast.error(`Error deleting exercise set: ${(error as Error).message}`);
+    }
+  };
+
+  const getLastSetNumber = (routineExerciseId: number): number => {
+    const toAddExerciseSet = routineExerciseSet.filter(set => set.routine_exercise_id === routineExerciseId);
+    return toAddExerciseSet[toAddExerciseSet.length - 1]?.set_number + 1 || 1;
+  };
+  const handleExerciseSetCreation = async (routineExerciseId: number) => {
+    const { data, error } = await supabase
+      .from('routine_exercise_sets')
+      .insert({
+        routine_exercise_id: routineExerciseId,
+        set_number: getLastSetNumber(routineExerciseId),
+        suggested_weight: 0,
+        suggested_repetitions: 0,
+      })
+      .select();
+    if (error) {
+      toast.error(`Error creating exercise set: ${error.message}`);
+    } else if (data) {
+      console.log(data);
+      fetchRoutineExerciseSet();
+      toast.success("Exercise set created successfully");
+    }
+  }
 
   if (isLoading) {
     return (
@@ -121,61 +205,80 @@ export default function RoutineDetails() {
     return <div>Error: {error.message}</div>;
   }
 
-  const paginatedExerciseSets = exerciseSets.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+  // const paginatedExerciseSets = routineExerciseSet.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
 
   return (
     <ErrorBoundary>
       <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between mb-6">
-          <h1 className="text-3xl font-bold mb-8">Rutina: {routine?.name}</h1>
-          <Button
-            variant="destructive"
-            onClick={() => {
-              if (window.confirm("¿Estás seguro de que quieres eliminar esta rutina?")) {
-                // Add the delete routine logic here
-                // For example:
-                deleteRoutine(currentRoutineId)
-              }
-            }}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-            Eliminar Rutina
-          </Button>
+        <div className="flex flex-col md:flex-row justify-between mb-6">
+          <h1 className="text-3xl font-bold mb-8">Rutina de {routine?.name}</h1>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                const newName = window.prompt("Ingrese el nuevo nombre para la rutina:", routine?.name)
+                if (newName) {
+                  updateRoutineName(newName)
+                }
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Editar
+            </Button>
+
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (window.confirm("¿Estás seguro de que quieres eliminar esta rutina?")) {
+                  // Add the delete routine logic here
+                  // For example:
+                  deleteRoutine()
+                }
+              }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Eliminar
+            </Button>
+          </div>
         </div>
         <div className="flex justify-between mb-6">
-          <AssignRoutineDialog routineId={currentRoutineId} />
+          <AssignRoutineDialog routine_id={currentRoutineId} />
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline">Crear nueva serie de ejercicio</Button>
+              <Button variant="outline">Crear Serie Nueva</Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Crear nueva serie de ejercicio</DialogTitle>
+                <DialogTitle>Crear Serie Nueva</DialogTitle>
               </DialogHeader>
               <DialogDescription>
                 Crea una nueva serie de ejercicio para esta rutina.
               </DialogDescription>
-              <ExerciseSetForm
+              {/* <ExerciseSetForm
                 exercises={exercises}
                 onSubmit={(newSet) => {
                   handleExerciseSetCreation(newSet);
                   setIsDialogOpen(false);
                 }}
                 routineId={currentRoutineId}
-              />
+              /> */}
             </DialogContent>
           </Dialog>
         </div>
         <ExerciseSetList
-          exerciseSets={paginatedExerciseSets}
+          routineExercises={routineExercise}
+          routineExerciseSets={routineExerciseSet}
           exercises={exercises}
           onUpdate={handleExerciseSetUpdate}
           onDelete={handleExerciseSetDeletion}
-          routineId={currentRoutineId}
+          onAdd={handleExerciseSetCreation}
+          routine_id={currentRoutineId}
         />
-        {exerciseSets.length > ITEMS_PER_PAGE && (
+        {/* {routineExercise.length > ITEMS_PER_PAGE && (
           <div className="mt-4 flex justify-center">
             <Button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -184,16 +287,16 @@ export default function RoutineDetails() {
               Anterior
             </Button>
             <span className="mx-4">
-              Página {page} de {Math.ceil(exerciseSets.length / ITEMS_PER_PAGE)}
+              Página {page} de {Math.ceil(routineExerciseSet.length / ITEMS_PER_PAGE)}
             </span>
             <Button
-              onClick={() => setPage((p) => Math.min(Math.ceil(exerciseSets.length / ITEMS_PER_PAGE), p + 1))}
-              disabled={page === Math.ceil(exerciseSets.length / ITEMS_PER_PAGE)}
+              onClick={() => setPage((p) => Math.min(Math.ceil(routineExerciseSet.length / ITEMS_PER_PAGE), p + 1))}
+              disabled={page === Math.ceil(routineExerciseSet.length / ITEMS_PER_PAGE)}
             >
               Siguiente
             </Button>
           </div>
-        )}
+        )} */}
       </div>
     </ErrorBoundary>
   );

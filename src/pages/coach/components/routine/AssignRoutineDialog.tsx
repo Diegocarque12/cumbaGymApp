@@ -5,7 +5,7 @@ import { useMutation, useQueryClient } from 'react-query';
 import supabase from '@/utils/supabaseClient';
 import { DialogDescription } from '@radix-ui/react-dialog';
 interface AssignRoutineDialogProps {
-    routineId: number;
+    routine_id: number;
 }
 
 interface User {
@@ -13,7 +13,7 @@ interface User {
     name: string;
 }
 
-const AssignRoutineDialog = ({ routineId }: AssignRoutineDialogProps) => {
+const AssignRoutineDialog = ({ routine_id }: AssignRoutineDialogProps) => {
     const [selectedUserId, setSelectedUserId] = useState<string>('');
     const [searchTerm, setSearchTerm] = useState<string>('');
     const queryClient = useQueryClient();
@@ -21,15 +21,16 @@ const AssignRoutineDialog = ({ routineId }: AssignRoutineDialogProps) => {
 
     const fetchUsersWithoutRoutine = async () => {
         const { data: assignedUsers } = await supabase
-            .from('userroutines')
-            .select('userId')
-            .eq('routineId', routineId);
+            .from('user_routines')
+            .select('user_id')
+            .eq('routine_id', routine_id);
 
-        const assignedUserIds = assignedUsers?.map(user => user.userId) || [];
+        const assignedUserIds = assignedUsers?.map(user => user.user_id) || [];
 
         const { data: availableUsers } = await supabase
             .from('users')
             .select('id, name')
+            .is('deleted_at', null)
             .not('id', 'in', `(${assignedUserIds.join(',')})`)
             .order('name');
 
@@ -45,16 +46,16 @@ const AssignRoutineDialog = ({ routineId }: AssignRoutineDialogProps) => {
     }, [])
 
     const assignRoutineMutation = useMutation(
-        async ({ userId, routineId }: { userId: string; routineId: number }) => {
+        async ({ user_id, routine_id }: { user_id: string; routine_id: number }) => {
             const { data, error } = await supabase
-                .from('userroutines')
-                .insert({ userId, routineId });
+                .from('user_routines')
+                .insert({ user_id, routine_id });
             if (error) throw error;
             return data;
         },
         {
             onSuccess: () => {
-                queryClient.invalidateQueries(['usersWithoutRoutine', routineId]);
+                queryClient.invalidateQueries(['usersWithoutRoutine', routine_id]);
             },
         }
     );
@@ -65,14 +66,14 @@ const AssignRoutineDialog = ({ routineId }: AssignRoutineDialogProps) => {
 
     const handleAssignRoutine = () => {
         if (selectedUserId) {
-            assignRoutineMutation.mutate({ userId: selectedUserId, routineId });
+            assignRoutineMutation.mutate({ user_id: selectedUserId, routine_id });
         }
     };
 
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button>Asignar Rutina</Button>
+                <Button>Asignar</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>

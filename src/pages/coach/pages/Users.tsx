@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import supabase from "../../../utils/supabaseClient";
-import type { User, Routine, Measurement } from "../../../../interfaces/types";
+import type { User, Routine, UserMeasurement } from "../../../../interfaces/types";
 
 import {
 	Dialog,
@@ -18,7 +18,7 @@ const Users = () => {
 	const [users, setUsers] = useState<User[]>([]);
 	const [selectedUser, setSelectedUser] = useState<User | null>(null);
 	const [userRoutines, setUserRoutines] = useState<Routine[]>([]);
-	const [userMeasurements, setUserMeasurements] = useState<Measurement[]>([]);
+	const [userMeasurements, setUserMeasurements] = useState<UserMeasurement[]>([]);
 	const [searchTerm, setSearchTerm] = useState("");
 
 	const [isLoading, setIsLoading] = useState(true);
@@ -33,7 +33,7 @@ const Users = () => {
 			const { data, error } = await supabase
 				.from("users")
 				.select("*")
-				.is("deletedAt", null);
+				.is("deleted_at", null);
 			if (error) {
 				throw new Error(error.message);
 			}
@@ -45,12 +45,12 @@ const Users = () => {
 		}
 	};
 
-	const fetchUserRoutines = async (userId: number) => {
+	const fetchUserRoutines = async (user_id: number) => {
 		try {
 			const { data, error } = await supabase
-				.from("userroutines")
+				.from("user_routines")
 				.select("*, routines(*)")
-				.eq("userId", userId);
+				.eq("user_id", user_id);
 			if (error) {
 				throw new Error(error.message);
 			}
@@ -60,18 +60,18 @@ const Users = () => {
 		}
 	};
 
-	const fetchUserMeasurements = async (userId: number) => {
+	const fetchUserMeasurements = async (user_id: number) => {
 		try {
 			const { data, error } = await supabase
-				.from("measurements")
+				.from("user_measurements")
 				.select("*")
-				.eq("userId", userId)
-				.order("measurementDate", { ascending: false })
+				.eq("user_id", user_id)
+				.order("measurement_date", { ascending: false })
 				.limit(1);
 			if (error) {
 				throw new Error(error.message);
 			}
-			setUserMeasurements(data as Measurement[]);
+			setUserMeasurements(data as UserMeasurement[]);
 		} catch (err) {
 			// setError("Error al obtener las medidas del usuario");
 		}
@@ -128,14 +128,14 @@ const Users = () => {
 					{users
 						.filter((user) =>
 							user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-							user.lastName.toLowerCase().includes(searchTerm.toLowerCase())
+							user.last_name.toLowerCase().includes(searchTerm.toLowerCase())
 						)
 						.map((user) => (
 							<Dialog key={user.id}>
 								<DialogTrigger>
-									<div className={`bg-gray-50 rounded-xl shadow-md p-6 hover:shadow-xl transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 cursor-pointer ${!user.isActive ? 'bg-gray-400' : ''}`} onClick={() => handleUserClick(user)}>
+									<div className={`bg-gray-50 rounded-xl shadow-md p-6 hover:shadow-xl transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 cursor-pointer ${!user.is_active ? 'bg-gray-400' : ''}`} onClick={() => handleUserClick(user)}>
 										<div className="flex flex-col">
-											<h2 className="text-xl font-semibold text-gray-800 mb-2">{user.name} {user.lastName}</h2>
+											<h2 className="text-xl font-semibold text-gray-800 mb-2">{user.name} {user.last_name}</h2>
 											<p className="text-sm text-gray-600">Edad: {user.age}</p>
 											<p className="text-sm text-gray-600">Objetivo: {user.goal}</p>
 										</div>
@@ -148,7 +148,7 @@ const Users = () => {
 											<div>
 												<div className="bg-gradient-to-r from-blue-600 to-blue-900 rounded-xl shadow-2xl p-4 sm:p-8 text-white mb-8">
 													<div className="flex flex-col sm:flex-row items-center mb-6 justify-between">
-														<h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-0">{selectedUser?.name} {selectedUser?.lastName}</h2>
+														<h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-0">{selectedUser?.name} {selectedUser?.last_name}</h2>
 														<div className="ml-auto">
 															<Link to={`/coach/users/${selectedUser?.id}/edit`} className="text-white font-semibold hover:text-blue-200 transition duration-300 ease-in-out">
 																<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -174,8 +174,8 @@ const Users = () => {
 														<div className="bg-white bg-opacity-20 rounded-lg p-4">
 															<p className="text-sm uppercase tracking-wide mb-1">Fecha de Inicio</p>
 															<p className="text-xl sm:text-2xl font-semibold">
-																{selectedUser?.startDate
-																	? new Date(selectedUser?.startDate).toLocaleDateString()
+																{selectedUser?.start_date
+																	? new Date(selectedUser?.start_date).toLocaleDateString()
 																	: "No disponible"}
 															</p>
 														</div>
@@ -205,8 +205,8 @@ const Users = () => {
 															<li key={measurement.id} className="bg-gray-50 rounded-xl p-4 sm:p-6 shadow-md">
 																<p className="text-lg font-semibold mb-3 text-gray-800">
 																	<strong>Fecha:</strong>{" "}
-																	{measurement.measurementDate
-																		? new Date(measurement.measurementDate).toLocaleDateString()
+																	{measurement.measurement_date
+																		? new Date(measurement.measurement_date).toLocaleDateString()
 																		: ""}
 																</p>
 																<div className="grid grid-cols-2 gap-4 mb-6">
@@ -221,14 +221,14 @@ const Users = () => {
 																		<img src="/assets/woman-human-outline.png" alt="Woman Silhouette" className="w-full h-full flex justify-center items-center object-contain" />
 																	)}
 
-																	<span className="absolute top-24 left-4 bg-blue-100 px-2 py-1 rounded-full text-sm">{measurement.leftArm} cm</span>
-																	<span className="absolute top-24 right-4 bg-blue-100 px-2 py-1 rounded-full text-sm">{measurement.rightArm} cm</span>
+																	<span className="absolute top-24 left-4 bg-blue-100 px-2 py-1 rounded-full text-sm">{measurement.left_arm} cm</span>
+																	<span className="absolute top-24 right-4 bg-blue-100 px-2 py-1 rounded-full text-sm">{measurement.right_arm} cm</span>
 
-																	<span className="absolute top-32 left-1/2 transform -translate-x-1/2 bg-blue-100 px-2 py-1 rounded-full text-sm">{measurement.upperWaist} cm</span>
-																	<span className="absolute top-40 left-1/2 transform -translate-x-1/2 bg-blue-100 px-2 py-1 rounded-full text-sm">{measurement.lowerWaist} cm</span>
+																	<span className="absolute top-32 left-1/2 transform -translate-x-1/2 bg-blue-100 px-2 py-1 rounded-full text-sm">{measurement.upper_waist} cm</span>
+																	<span className="absolute top-40 left-1/2 transform -translate-x-1/2 bg-blue-100 px-2 py-1 rounded-full text-sm">{measurement.lower_waist} cm</span>
 
-																	<span className="absolute bottom-32 left-8 bg-blue-100 px-2 py-1 rounded-full text-sm">{measurement.leftThigh} cm</span>
-																	<span className="absolute bottom-32 right-8 bg-blue-100 px-2 py-1 rounded-full text-sm">{measurement.rightThigh} cm</span>
+																	<span className="absolute bottom-32 left-8 bg-blue-100 px-2 py-1 rounded-full text-sm">{measurement.left_thigh} cm</span>
+																	<span className="absolute bottom-32 right-8 bg-blue-100 px-2 py-1 rounded-full text-sm">{measurement.right_thigh} cm</span>
 																</div>
 															</li>
 														))}

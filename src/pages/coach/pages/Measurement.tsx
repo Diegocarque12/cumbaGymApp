@@ -1,30 +1,30 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import supabase from '@/utils/supabaseClient';
-import { Measurement, User } from 'interfaces/types';
+import { UserMeasurement, User } from 'interfaces/types';
 
-const UserMeasurement = () => {
-	const { userId } = useParams<{ userId: string }>();
+const Measurement = () => {
+	const { user_id } = useParams<{ user_id: string }>();
 	const [currentUser, setCurrentUser] = useState<User | null>(null)
 	const [showForm, setShowForm] = useState(false);
-	const [measurements, setMeasurements] = useState<Measurement[]>([]);
-	const [editingMeasurement, setEditingMeasurement] = useState<Measurement | null>(null);
-	const [newMeasurement, setNewMeasurement] = useState<Omit<Measurement, 'id'>>({
-		userId: Number(userId),
-		leftArm: 0,
-		rightArm: 0,
-		upperWaist: 0,
-		lowerWaist: 0,
-		leftThigh: 0,
-		rightThigh: 0,
-		measurementDate: new Date().toISOString().split('T')[0],
+	const [measurements, setMeasurements] = useState<UserMeasurement[]>([]);
+	const [editingMeasurement, setEditingMeasurement] = useState<UserMeasurement | null>(null);
+	const [newMeasurement, setNewMeasurement] = useState<Omit<UserMeasurement, 'id'>>({
+		user_id: Number(user_id),
+		left_arm: 0,
+		right_arm: 0,
+		upper_waist: 0,
+		lower_waist: 0,
+		left_thigh: 0,
+		right_thigh: 0,
+		measurement_date: new Date().toISOString().split('T')[0],
 		weight: 0,
 		height: 0,
 	});
 
 	useEffect(() => {
 		fetchMeasurements();
-	}, [userId]);
+	}, [user_id]);
 
 
 	useEffect(() => {
@@ -32,7 +32,7 @@ const UserMeasurement = () => {
 			const { data, error } = await supabase
 				.from('users')
 				.select('*')
-				.eq('id', userId)
+				.eq('id', user_id)
 				.single()
 
 			if (error) {
@@ -43,17 +43,17 @@ const UserMeasurement = () => {
 		}
 
 		fetchCurrentUser()
-	}, [userId])
+	}, [user_id])
 
 	const fetchMeasurements = async () => {
 		const { data, error } = await supabase
-			.from('measurements')
+			.from('user_user_user_measurements')
 			.select('*')
-			.eq('userId', userId)
-			.order('measurementDate', { ascending: false });
+			.eq('user_id', user_id)
+			.order('measurement_date', { ascending: false });
 
 		if (error) {
-			console.error('Error fetching measurements:', error);
+			console.error('Error fetching user_measurements:', error);
 		} else {
 			setMeasurements(data || []);
 		}
@@ -78,34 +78,34 @@ const UserMeasurement = () => {
 		fetchMeasurements();
 		setEditingMeasurement(null);
 		setNewMeasurement({
-			userId: Number(userId),
-			leftArm: 0,
-			rightArm: 0,
-			upperWaist: 0,
-			lowerWaist: 0,
-			leftThigh: 0,
-			rightThigh: 0,
-			measurementDate: new Date().toISOString().split('T')[0],
+			user_id: Number(user_id),
+			left_arm: 0,
+			right_arm: 0,
+			upper_waist: 0,
+			lower_waist: 0,
+			left_thigh: 0,
+			right_thigh: 0,
+			measurement_date: new Date().toISOString().split('T')[0],
 			weight: 0,
 			height: 0,
 		});
 	};
 
 	const addMeasurement = async () => {
-		const { error } = await supabase.from('measurements').insert([newMeasurement]);
+		const { error } = await supabase.from('user_measurements').insert([newMeasurement]);
 		if (error) console.error('Error adding measurement:', error);
 	};
 
-	const updateMeasurement = async (measurement: Measurement) => {
+	const updateMeasurement = async (measurement: UserMeasurement) => {
 		const { error } = await supabase
-			.from('measurements')
+			.from('user_measurements')
 			.update(measurement)
 			.eq('id', measurement.id);
 		if (error) console.error('Error updating measurement:', error);
 	};
 
 	const deleteMeasurement = async (id: number) => {
-		const { error } = await supabase.from('measurements').delete().eq('id', id);
+		const { error } = await supabase.from('user_measurements').delete().eq('id', id);
 		if (error) {
 			console.error('Error deleting measurement:', error);
 		} else {
@@ -113,23 +113,23 @@ const UserMeasurement = () => {
 		}
 	};
 
-	const startEditing = (measurement: Measurement) => {
+	const startEditing = (measurement: UserMeasurement) => {
 		setEditingMeasurement(measurement);
 	};
 
-	const copyToClipboard = (measurement: Measurement) => {
-		const formattedDate = new Date(measurement.measurementDate).toLocaleDateString()
+	const copyToClipboard = (measurement: UserMeasurement) => {
+		const formattedDate = new Date(measurement.measurement_date).toLocaleDateString()
 		const bmi = (measurement.weight / Math.pow(measurement.height / 100, 2)).toFixed(2)
 
 		const message = `Medidas (${formattedDate}):
             Peso: ${measurement.weight} kg
             Altura: ${measurement.height} cm
-            Brazo Izquierdo: ${measurement.leftArm} cm
-            Brazo Derecho: ${measurement.rightArm} cm
-            Cintura Superior: ${measurement.upperWaist} cm
-            Cintura Inferior: ${measurement.lowerWaist} cm
-            Muslo Izquierdo: ${measurement.leftThigh} cm
-            Muslo Derecho: ${measurement.rightThigh} cm
+            Brazo Izquierdo: ${measurement.left_arm} cm
+            Brazo Derecho: ${measurement.right_arm} cm
+            Cintura Superior: ${measurement.upper_waist} cm
+            Cintura Inferior: ${measurement.lower_waist} cm
+            Muslo Izquierdo: ${measurement.left_thigh} cm
+            Muslo Derecho: ${measurement.right_thigh} cm
             BMI: ${bmi}
             `
 		navigator.clipboard.writeText(message).then(() => {
@@ -143,7 +143,7 @@ const UserMeasurement = () => {
 		<div className="container mx-auto px-4 py-8">
 			<h1 className="text-3xl font-bold mb-6 text-center">Historial de medidas</h1>
 			<div className="mb-8">
-				<h2 className="text-2xl font-semibold mb-4 text-center">{currentUser?.name} {currentUser?.lastName}</h2>
+				<h2 className="text-2xl font-semibold mb-4 text-center">{currentUser?.name} {currentUser?.last_name}</h2>
 				<div className="overflow-x-auto">
 					<table className="w-full border-collapse">
 						<thead>
@@ -166,15 +166,15 @@ const UserMeasurement = () => {
 								const bmi = measurement.weight / Math.pow(measurement.height / 100, 2)
 								return (
 									<tr key={measurement.id}>
-										<td className="border p-2 text-center whitespace-nowrap">{new Date(measurement.measurementDate).toLocaleDateString()}</td>
+										<td className="border p-2 text-center whitespace-nowrap">{new Date(measurement.measurement_date).toLocaleDateString()}</td>
 										<td className="border p-2 text-center">{measurement.weight}</td>
 										<td className="border p-2 text-center">{measurement.height}</td>
-										<td className="border p-2 text-center">{measurement.leftArm}</td>
-										<td className="border p-2 text-center">{measurement.rightArm}</td>
-										<td className="border p-2 text-center">{measurement.upperWaist}</td>
-										<td className="border p-2 text-center">{measurement.lowerWaist}</td>
-										<td className="border p-2 text-center">{measurement.leftThigh}</td>
-										<td className="border p-2 text-center">{measurement.rightThigh}</td>
+										<td className="border p-2 text-center">{measurement.left_arm}</td>
+										<td className="border p-2 text-center">{measurement.right_arm}</td>
+										<td className="border p-2 text-center">{measurement.upper_waist}</td>
+										<td className="border p-2 text-center">{measurement.lower_waist}</td>
+										<td className="border p-2 text-center">{measurement.left_thigh}</td>
+										<td className="border p-2 text-center">{measurement.right_thigh}</td>
 										<td className="border p-2 text-center">{bmi.toFixed(2)}</td>
 										<td className="border p-2 text-center flex gap-2">
 											<button
@@ -225,12 +225,12 @@ const UserMeasurement = () => {
 										...newMeasurement,
 										weight: lastMeasurement.weight,
 										height: lastMeasurement.height,
-										leftArm: lastMeasurement.leftArm,
-										rightArm: lastMeasurement.rightArm,
-										upperWaist: lastMeasurement.upperWaist,
-										lowerWaist: lastMeasurement.lowerWaist,
-										leftThigh: lastMeasurement.leftThigh,
-										rightThigh: lastMeasurement.rightThigh,
+										left_arm: lastMeasurement.left_arm,
+										right_arm: lastMeasurement.right_arm,
+										upper_waist: lastMeasurement.upper_waist,
+										lower_waist: lastMeasurement.lower_waist,
+										left_thigh: lastMeasurement.left_thigh,
+										right_thigh: lastMeasurement.right_thigh,
 									})
 								}
 							}}
@@ -245,24 +245,24 @@ const UserMeasurement = () => {
 
 					<div className='flex gap-2 w-full'>
 						<div className="space-y-2 w-full">
-							<label htmlFor="leftArm" className="block text-sm font-medium text-gray-700">Brazo Izquierdo (cm)</label>
+							<label htmlFor="left_arm" className="block text-sm font-medium text-gray-700">Brazo Izquierdo (cm)</label>
 							<input
-								id="leftArm"
+								id="left_arm"
 								type="number"
-								name="leftArm"
-								value={editingMeasurement?.leftArm || newMeasurement.leftArm}
+								name="left_arm"
+								value={editingMeasurement?.left_arm || newMeasurement.left_arm}
 								onChange={(e) => handleInputChange(e, !!editingMeasurement)}
 								placeholder="Ingrese medida del brazo izquierdo"
 								className="form-input block w-full px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
 							/>
 						</div>
 						<div className="space-y-2 w-full">
-							<label htmlFor="rightArm" className="block text-sm font-medium text-gray-700">Brazo Derecho (cm)</label>
+							<label htmlFor="right_arm" className="block text-sm font-medium text-gray-700">Brazo Derecho (cm)</label>
 							<input
-								id="rightArm"
+								id="right_arm"
 								type="number"
-								name="rightArm"
-								value={editingMeasurement?.rightArm || newMeasurement.rightArm}
+								name="right_arm"
+								value={editingMeasurement?.right_arm || newMeasurement.right_arm}
 								onChange={(e) => handleInputChange(e, !!editingMeasurement)}
 								placeholder="Ingrese medida del brazo derecho"
 								className="form-input block w-full px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
@@ -271,24 +271,24 @@ const UserMeasurement = () => {
 					</div>
 					<div className='flex gap-2'>
 						<div className="space-y-2 w-full">
-							<label htmlFor="upperWaist" className="block text-sm font-medium text-gray-700">Cintura Superior (cm)</label>
+							<label htmlFor="upper_waist" className="block text-sm font-medium text-gray-700">Cintura Superior (cm)</label>
 							<input
-								id="upperWaist"
+								id="upper_waist"
 								type="number"
-								name="upperWaist"
-								value={editingMeasurement?.upperWaist || newMeasurement.upperWaist}
+								name="upper_waist"
+								value={editingMeasurement?.upper_waist || newMeasurement.upper_waist}
 								onChange={(e) => handleInputChange(e, !!editingMeasurement)}
 								placeholder="Ingrese medida de cintura superior"
 								className="form-input block w-full px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
 							/>
 						</div>
 						<div className="space-y-2 w-full">
-							<label htmlFor="lowerWaist" className="block text-sm font-medium text-gray-700">Cintura Inferior (cm)</label>
+							<label htmlFor="lower_waist" className="block text-sm font-medium text-gray-700">Cintura Inferior (cm)</label>
 							<input
-								id="lowerWaist"
+								id="lower_waist"
 								type="number"
-								name="lowerWaist"
-								value={editingMeasurement?.lowerWaist || newMeasurement.lowerWaist}
+								name="lower_waist"
+								value={editingMeasurement?.lower_waist || newMeasurement.lower_waist}
 								onChange={(e) => handleInputChange(e, !!editingMeasurement)}
 								placeholder="Ingrese medida de cintura inferior"
 								className="form-input block w-full px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
@@ -297,24 +297,24 @@ const UserMeasurement = () => {
 					</div>
 					<div className='flex gap-2'>
 						<div className="space-y-2 w-full">
-							<label htmlFor="leftThigh" className="block text-sm font-medium text-gray-700">Muslo Izquierdo (cm)</label>
+							<label htmlFor="left_thigh" className="block text-sm font-medium text-gray-700">Muslo Izquierdo (cm)</label>
 							<input
-								id="leftThigh"
+								id="left_thigh"
 								type="number"
-								name="leftThigh"
-								value={editingMeasurement?.leftThigh || newMeasurement.leftThigh}
+								name="left_thigh"
+								value={editingMeasurement?.left_thigh || newMeasurement.left_thigh}
 								onChange={(e) => handleInputChange(e, !!editingMeasurement)}
 								placeholder="Ingrese medida del muslo izquierdo"
 								className="form-input block w-full px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
 							/>
 						</div>
 						<div className="space-y-2 w-full">
-							<label htmlFor="rightThigh" className="block text-sm font-medium text-gray-700">Muslo Derecho (cm)</label>
+							<label htmlFor="right_thigh" className="block text-sm font-medium text-gray-700">Muslo Derecho (cm)</label>
 							<input
-								id="rightThigh"
+								id="right_thigh"
 								type="number"
-								name="rightThigh"
-								value={editingMeasurement?.rightThigh || newMeasurement.rightThigh}
+								name="right_thigh"
+								value={editingMeasurement?.right_thigh || newMeasurement.right_thigh}
 								onChange={(e) => handleInputChange(e, !!editingMeasurement)}
 								placeholder="Ingrese medida del muslo derecho"
 								className="form-input block w-full px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
@@ -348,12 +348,12 @@ const UserMeasurement = () => {
 						</div>
 					</div>
 					<div className="space-y-2">
-						<label htmlFor="measurementDate" className="block text-sm font-medium text-gray-700">Fecha de Medición</label>
+						<label htmlFor="measurement_date" className="block text-sm font-medium text-gray-700">Fecha de Medición</label>
 						<input
-							id="measurementDate"
+							id="measurement_date"
 							type="date"
-							name="measurementDate"
-							value={editingMeasurement?.measurementDate || newMeasurement.measurementDate}
+							name="measurement_date"
+							value={editingMeasurement?.measurement_date || newMeasurement.measurement_date}
 							onChange={(e) => handleInputChange(e, !!editingMeasurement)}
 							className="form-input block w-full px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
 						/>
@@ -370,5 +370,5 @@ const UserMeasurement = () => {
 	);
 };
 
-export default UserMeasurement;
+export default Measurement;
 

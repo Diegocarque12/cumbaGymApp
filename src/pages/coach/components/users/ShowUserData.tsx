@@ -16,7 +16,7 @@ import {
 
 
 const ShowUserData = () => {
-    const { userId } = useParams<{ userId: string }>();
+    const { user_id } = useParams<{ user_id: string }>();
     const [user, setUser] = useState<User | null>(null);
     const [userRoutines, setUserRoutines] = useState<Routine[]>([]);
     const [routines, setRoutines] = useState<Routine[]>([]);
@@ -28,14 +28,14 @@ const ShowUserData = () => {
         fetchUserData();
         fetchUserRoutines();
         fetchAllRoutines();
-    }, [userId]);
+    }, [user_id]);
 
     const fetchUserData = async () => {
-        if (userId) {
+        if (user_id) {
             const { data, error } = await supabase
                 .from('users')
                 .select('*')
-                .eq('id', userId)
+                .eq('id', user_id)
                 .single();
             if (data) setUser(data);
             if (error) console.error('Error fetching user data:', error);
@@ -43,17 +43,17 @@ const ShowUserData = () => {
     };
 
     const fetchUserRoutines = async () => {
-        if (userId) {
+        if (user_id) {
             const { data, error } = await supabase
-                .from("userroutines")
+                .from("user_routines")
                 .select("*, routines(*)")
-                .eq("userId", userId);
+                .eq("user_id", user_id);
             if (data) setUserRoutines(data.map((item) => item.routines) as Routine[]);
             if (error) console.error('Error fetching routines:', error);
         }
     };
     const fetchAllRoutines = async () => {
-        if (userId) {
+        if (user_id) {
             const { data, error } = await supabase
                 .from("routines")
                 .select("*")
@@ -63,11 +63,11 @@ const ShowUserData = () => {
     };
 
     const updateUserData = async (updatedData: Partial<User>) => {
-        if (userId) {
+        if (user_id) {
             const { error } = await supabase
                 .from('users')
                 .update(updatedData)
-                .eq('id', userId);
+                .eq('id', user_id);
             if (error) console.error('Error updating user data:', error);
             else fetchUserData();
         }
@@ -75,28 +75,28 @@ const ShowUserData = () => {
 
     const addRoutine = async (newRoutine: Routine) => {
         const { error } = await supabase
-            .from('userroutines')
-            .insert({ routineId: newRoutine.id, userId: userId });
+            .from('user_routines')
+            .insert({ routine_id: newRoutine.id, user_id: user_id });
         if (error) console.error('Error adding routine:', error);
         else fetchUserRoutines();
     };
 
-    const removeRoutine = async (routineId: string) => {
+    const removeRoutine = async (routine_id: string) => {
         const { error } = await supabase
-            .from('userroutines')
+            .from('user_routines')
             .delete()
-            .eq('routineId', routineId)
-            .eq('userId', userId);
+            .eq('routine_id', routine_id)
+            .eq('user_id', user_id);
         if (error) console.error('Error removing routine:', error);
         else fetchUserRoutines();
     };
 
     const handleDeactivateUser = async () => {
-        if (userId) {
+        if (user_id) {
             const { error } = await supabase
                 .from('users')
-                .update({ isActive: false })
-                .eq('id', userId);
+                .update({ is_active: false })
+                .eq('id', user_id);
             if (error) console.error('Error deactivating user:', error);
             else {
                 navigate('/coach/users')
@@ -105,11 +105,11 @@ const ShowUserData = () => {
     };
 
     const handleDeleteUser = async () => {
-        if (userId) {
+        if (user_id) {
             const { error } = await supabase
                 .from('users')
-                .update({ deletedAt: new Date().toISOString() })
-                .eq('id', userId);
+                .update({ deleted_at: new Date().toISOString() })
+                .eq('id', user_id);
             if (error) console.error('Error deleting user:', error);
             else {
                 navigate('/coach/users')
@@ -131,12 +131,12 @@ const ShowUserData = () => {
                         }} className="space-y-4">
 
                             <div>
-                                <label htmlFor="nationalId" className="block text-sm font-medium text-gray-700">Identificación Nacional</label>
+                                <label htmlFor="national_id" className="block text-sm font-medium text-gray-700">Identificación Nacional</label>
                                 <input
-                                    id="nationalId"
+                                    id="national_id"
                                     type="text"
-                                    value={user.nationalId}
-                                    onChange={(e) => setUser({ ...user, nationalId: e.target.value })}
+                                    value={user.national_id}
+                                    onChange={(e) => setUser({ ...user, national_id: e.target.value })}
                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                 />
                             </div>
@@ -151,12 +151,12 @@ const ShowUserData = () => {
                                 />
                             </div>
                             <div>
-                                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Apellido</label>
+                                <label htmlFor="last_name" className="block text-sm font-medium text-gray-700">Apellido</label>
                                 <input
-                                    id="lastName"
+                                    id="last_name"
                                     type="text"
-                                    value={user.lastName}
-                                    onChange={(e) => setUser({ ...user, lastName: e.target.value })}
+                                    value={user.last_name}
+                                    onChange={(e) => setUser({ ...user, last_name: e.target.value })}
                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                 />
                             </div>
@@ -181,11 +181,11 @@ const ShowUserData = () => {
                                 />
                             </div>
                             <div>
-                                <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">Fecha de Inicio</label>
+                                <label htmlFor="start_date" className="block text-sm font-medium text-gray-700">Fecha de Inicio</label>
                                 <input
-                                    id="startDate"
+                                    id="start_date"
                                     type="date"
-                                    value={user.startDate ? new Date(user.startDate).toISOString().split('T')[0] : ''} onChange={(e) => setUser({ ...user, startDate: new Date(e.target.value) })}
+                                    value={user.start_date ? new Date(user.start_date).toISOString().split('T')[0] : ''} onChange={(e) => setUser({ ...user, start_date: new Date(e.target.value) })}
                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                 />
                             </div>
@@ -228,12 +228,12 @@ const ShowUserData = () => {
                         </form>
                     ) : (
                         <div className="space-y-4">
-                            <p><span className="font-semibold">Identificación Nacional:</span> {user.nationalId}</p>
+                            <p><span className="font-semibold">Identificación Nacional:</span> {user.national_id}</p>
                             <p><span className="font-semibold">Nombre:</span> {user.name}</p>
-                            <p><span className="font-semibold">Apellido:</span> {user.lastName}</p>
+                            <p><span className="font-semibold">Apellido:</span> {user.last_name}</p>
                             <p><span className="font-semibold">Edad:</span> {user.age}</p>
                             <p className="capitalize"><span className="font-semibold">Objetivo:</span> {user.goal || 'No establecido'}</p>
-                            <p><span className="font-semibold">Fecha de Inicio:</span> {new Date(user.startDate).toLocaleDateString()}</p>
+                            <p><span className="font-semibold">Fecha de Inicio:</span> {new Date(user.start_date).toLocaleDateString()}</p>
                             <p className="capitalize"><span className="font-semibold ">Género:</span> {user.gender}</p>
                             <p className="capitalize"><span className="font-semibold">Rol de Usuario:</span> {user.role}</p>
                             <div className="flex justify-between">

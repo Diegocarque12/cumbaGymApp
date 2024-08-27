@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import supabase from "../../../utils/supabaseClient";
-import type { Routine, ExerciseSet, User } from "../../../../interfaces/types";
+import type { Routine, User } from "../../../../interfaces/types";
 import { useSessionStorage } from "@/hooks/useSessionStorage";
 
 const TodayWorkout = () => {
     const [routines, setRoutines] = useState<Routine[]>([]);
     const [selectedRoutineId, setSelectedRoutineId] = useState<number | null>(null);
-    const [exerciseSets, setExerciseSets] = useState<ExerciseSet[]>([]);
     const [completedSets, setCompletedSets] = useState<boolean[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -20,6 +19,8 @@ const TodayWorkout = () => {
     useEffect(() => {
         fetchRoutines();
         fetchUsers();
+        console.log(completedSets);
+
     }, []);
 
     useEffect(() => {
@@ -63,7 +64,7 @@ const TodayWorkout = () => {
             const { data, error } = await supabase
                 .from("users")
                 .select("*")
-                .is("deletedAt", null)
+                .is("deleted_at", null)
                 .order("name", { ascending: true });
             if (error) {
                 throw new Error(error.message);
@@ -79,27 +80,26 @@ const TodayWorkout = () => {
     /**
      * Fetches exercise sets for a given routine ID, including exercise names.
      * Updates the state with the fetched data and initializes completion status.
-     * @param routineId - The ID of the routine to fetch exercise sets for.
+     * @param routine_id - The ID of the routine to fetch exercise sets for.
      */
-    const fetchExerciseSets = async (routineId: number) => {
+    const fetchExerciseSets = async (routine_id: number) => {
         try {
-            const { data: exerciseSetsData, error: exerciseSetsError } = await supabase
-                .from("exercisesets")
+            const { data: routineExercisesData, error: exerciseSetsError } = await supabase
+                .from("routine_exercises")
                 .select("*")
-                .eq("routineId", routineId);
+                .eq("routine_id", routine_id);
 
             if (exerciseSetsError) {
                 throw new Error(exerciseSetsError.message);
             }
 
             const exerciseSetsWithNames = await Promise.all(
-                exerciseSetsData.map(async (exerciseSet) => {
-                    const exerciseName = await getExerciseName(exerciseSet.exerciseId);
-                    return { ...exerciseSet, exerciseName };
+                routineExercisesData.map(async (exerciseSet) => {
+                    const exercise_name = await getExerciseName(exerciseSet.exercise_id);
+                    return { ...exerciseSet, exercise_name };
                 })
             );
 
-            setExerciseSets(exerciseSetsWithNames);
             setCompletedSets(new Array(exerciseSetsWithNames.length).fill(false));
         } catch (error) {
             console.error("Error al obtener los sets de ejercicios:", error);
@@ -108,15 +108,15 @@ const TodayWorkout = () => {
 
     /**
      * Retrieves the name of an exercise by its ID from the database.
-     * @param exerciseId - The ID of the exercise to fetch the name for.
+     * @param exercise_id - The ID of the exercise to fetch the name for.
      * @returns The name of the exercise or an empty string if an error occurs.
      */
-    const getExerciseName = async (exerciseId: number) => {
+    const getExerciseName = async (exercise_id: number) => {
         try {
             const { data, error } = await supabase
                 .from("exercises")
                 .select("name")
-                .eq("id", exerciseId)
+                .eq("id", exercise_id)
                 .single();
 
             if (error) {
@@ -136,9 +136,9 @@ const TodayWorkout = () => {
      * @param event - The change event from the routine select element.
      */
     const handleRoutineChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const routineId = parseInt(event.target.value);
-        setSelectedRoutineId(routineId);
-        await fetchExerciseSets(routineId);
+        const routine_id = parseInt(event.target.value);
+        setSelectedRoutineId(routine_id);
+        await fetchExerciseSets(routine_id);
         setIsRoutineSelected(true);
     };
 
@@ -147,43 +147,21 @@ const TodayWorkout = () => {
      * @param index - The index of the exercise set to update.
      * @param completed - The new completion status.
      */
-    const handleSetCompletion = (index: number, completed: boolean) => {
-        const updatedCompletedSets = [...completedSets];
-        updatedCompletedSets[index] = completed;
-        setCompletedSets(updatedCompletedSets);
-    };
+    // const handleSetCompletion = (index: number, completed: boolean) => {
+    //     const updatedCompletedSets = [...completedSets];
+    //     updatedCompletedSets[index] = completed;
+    //     setCompletedSets(updatedCompletedSets);
+    // };
 
-    /**
-     * Updates the weight of a specific exercise set.
-     * @param exerciseIndex - The index of the exercise set to update.
-     * @param value - The new weight value.
-     */
-    const handleWeightChange = (exerciseIndex: number, value: number) => {
-        const updatedExerciseSets = [...exerciseSets];
-        updatedExerciseSets[exerciseIndex].weight = value;
-        setExerciseSets(updatedExerciseSets);
-    };
-
-    /**
-     * Updates the repetitions of a specific exercise set.
-     * @param exerciseIndex - The index of the exercise set to update.
-     * @param value - The new repetitions value.
-     */
-    const handleRepetitionsChange = (exerciseIndex: number, value: number) => {
-        const updatedExerciseSets = [...exerciseSets];
-        updatedExerciseSets[exerciseIndex].repetitions = value;
-        setExerciseSets(updatedExerciseSets);
-    };
 
     /**
      * Resets the state when finishing a routine.
      */
-    const handleFinishRoutine = () => {
-        setSelectedRoutineId(null);
-        setExerciseSets([]);
-        setCompletedSets([]);
-        setIsRoutineSelected(false);
-    };
+    // const handleFinishRoutine = async () => {
+    //     setSelectedRoutineId(null);
+    //     setCompletedSets([]);
+    //     setIsRoutineSelected(false);
+    // };
 
     /**
      * Updates the list of unpinned users based on the current users and pinned users.
@@ -236,7 +214,7 @@ const TodayWorkout = () => {
     const handleSearchName = (e: React.ChangeEvent<HTMLInputElement>) => {
         const searchTerm = e.target.value.toLowerCase();
         const filteredUsers = unPinnedUsers.filter((user) =>
-            user.name.toLowerCase().includes(searchTerm) || user.lastName.toLowerCase().includes(searchTerm)
+            user.name.toLowerCase().includes(searchTerm) || user.last_name.toLowerCase().includes(searchTerm)
         );
         setFiltedUsers(filteredUsers);
     }
@@ -250,7 +228,7 @@ const TodayWorkout = () => {
     }
 
     return (
-        <div className="max-w-lg mx-auto container">
+        <div className="container">
             <div className="flex flex-col items-center mb-4">
                 <label htmlFor="screenSwitch" className="mr-3">Cambiar pantalla:</label>
                 <div className="flex items-center space-x-4">
@@ -272,7 +250,7 @@ const TodayWorkout = () => {
             </div>
             {currentScreen === "myWorkout" && (
                 <>
-                    <h2 className="text-2xl font-bold mb-4">Rutina del día</h2>
+                    <h2 className="text-2xl font-bold">Rutina del día</h2>
                     {!isRoutineSelected && (
                         <div className="mb-4">
                             <select
@@ -289,13 +267,26 @@ const TodayWorkout = () => {
                             </select>
                         </div>
                     )}
-                    {exerciseSets.length > 0 && (
+                    {/* {exerciseSets.length > 0 && isRoutineSelected && (
                         <>
-                            <h2 className="text-xl font-semibold mb-4">{routines.find(routine => routine.id === selectedRoutineId)?.name}</h2>
+                            <div className="flex items-center mb-4 justify-between">
+
+                                <h2 className="text-xl font-semibold mb-4">{routines.find(routine => routine.id === selectedRoutineId)?.name}</h2>
+                                {isRoutineSelected && (
+                                    <button
+                                        onClick={() => setIsRoutineSelected(!isRoutineSelected)}
+                                        className="ml-2 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                    </button>
+                                )}
+                            </div>
                             <h3 className="text-xl font-semibold mb-2">Lista de Ejercicios</h3>
                             {exerciseSets.map((exerciseSet, exerciseIndex) => (
                                 <div key={exerciseSet.id} className="mb-8">
-                                    <h3 className="text-xl font-semibold mb-2">Ejercicio: {exerciseSet.exerciseName}</h3>
+                                    <h3 className="text-xl font-semibold mb-2">Ejercicio: {exerciseSet.exercise_name}</h3>
                                     {Array.from({ length: exerciseSet.setnumber }).map((_, setIndex) => (
                                         <div key={`${exerciseSet.id}-${setIndex}`} className="bg-gray-100 p-4 rounded-lg mb-4">
                                             <p className="text-lg font-medium mb-2">Set: {setIndex + 1}</p>
@@ -379,18 +370,18 @@ const TodayWorkout = () => {
                                 </div>
                             </>
                         )
-                    }
+                    } */}
                 </>
             )}
             {currentScreen === "presentUsers" && (
                 <div className="flex flex-col">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-2xl font-bold">Usuarios Presentes</h2>
+                    <div className="flex flex-col-reverse justify-between items-center mb-4">
+                        <h2 className="text-2xl font-bold mt-4">Usuarios Presentes</h2>
                         <button className="bg-slate-400 p-2 rounded-lg hover:bg-slate-500" onClick={handleReloadUsers}>
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                             </svg>
-                            Recargar Lista de Usuarios
+                            Refrescar
                         </button>
                     </div>
                     <div className="flex flex-wrap justify-center">
@@ -400,7 +391,7 @@ const TodayWorkout = () => {
                             </div>
                         )}
                         {pinnedUsers.length > 0 && pinnedUsers.map((user) => (
-                            <div key={user.id} className="mb-8 p-8 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 bg-gray-300 rounded-lg m-2 relative ">
+                            <div key={user.id} className="mb-8 p-8 w-full sm:w-1/2 md:w-1/3 bg-gray-300 rounded-lg m-2 relative ">
                                 <button className="absolute top-2 right-2" onClick={() => handleUnPinUser(user)}>
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 absolute top-2 right-2 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5l-6.46 6.46a2 2 0 0 0 0 2.83L15 21" />
@@ -408,13 +399,13 @@ const TodayWorkout = () => {
                                 </button>
                                 <div>
                                     <p className="text-lg font-semibold">{user.name}</p>
-                                    <p className="text-gray-600">{user.lastName}</p>
+                                    <p className="text-gray-600">{user.last_name}</p>
                                 </div>
                             </div>
                         ))}
                     </div>
                     <div className="flex flex-wrap justify-center pt-8 border-t-2 border-gray-300 pb-4 ">
-                        <h2 className="text-2xl font-bold">Todos Los Usuarios</h2>
+                        <h2 className="text-2xl font-bold mb-4">Todos Los Usuarios</h2>
                         <div className="mb-4 w-full">
                             <input
                                 type="text"
@@ -426,7 +417,7 @@ const TodayWorkout = () => {
                             />
                         </div>
                         {filtedUsers.length > 0 && filtedUsers.map((user) => (
-                            <div key={user.id} className="mb-4 p-8 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 bg-gray-300 rounded-lg m-2 relative">
+                            <div key={user.id} className="mb-4 p-8 w-full sm:w-1/2 md:w-1/3 bg-gray-300 rounded-lg m-2 relative">
                                 <button className="absolute top-2 right-2" onClick={() => handlePinUser(user)}>
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 absolute top-2 right-2 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
@@ -435,12 +426,12 @@ const TodayWorkout = () => {
 
                                 <div>
                                     <p className="text-lg font-semibold">{user.name}</p>
-                                    <p className="text-gray-600">{user.lastName}</p>
+                                    <p className="text-gray-600">{user.last_name}</p>
                                 </div>
                             </div>
                         ))}
                         {filtedUsers.length === 0 && unPinnedUsers.map((user) => (
-                            <div key={user.id} className="mb-4 p-8 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 bg-gray-300 rounded-lg m-2 relative">
+                            <div key={user.id} className="mb-4 p-8 w-full sm:w-1/2 md:w-1/3 bg-gray-300 rounded-lg m-2 relative">
                                 <button className="absolute top-2 right-2" onClick={() => handlePinUser(user)}>
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 absolute top-2 right-2 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
@@ -449,7 +440,7 @@ const TodayWorkout = () => {
 
                                 <div>
                                     <p className="text-lg font-semibold">{user.name}</p>
-                                    <p className="text-gray-600">{user.lastName}</p>
+                                    <p className="text-gray-600">{user.last_name}</p>
                                 </div>
                             </div>
 

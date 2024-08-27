@@ -7,7 +7,7 @@ import TodayWorkout from "../pages/TodayWorkout";
 import Exercises from "../pages/Exercises";
 import Users from "../pages/Users";
 import Dashboard from "../pages/Dashboard";
-import UserMeasurement from "../pages/UserMeasurement";
+import Measurement from "../pages/Measurement";
 import ShowUserData from "../components/users/ShowUserData";
 
 const CouchRoutes = () => {
@@ -17,13 +17,13 @@ const CouchRoutes = () => {
       <Routes>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/exercises" element={<Exercises />} />
-        <Route path="/exercises/:exerciseId" element={<Exercises />} />
-        <Route path="/exercises/:exerciseId/edit" element={<Exercises />} />
+        <Route path="/exercises/:exercise_id" element={<Exercises />} />
+        <Route path="/exercises/:exercise_id/edit" element={<Exercises />} />
         <Route path="/users" element={<Users />} />
-        <Route path="/users/:userId/edit" element={<ShowUserData />} />
-        <Route path="/users/:userId/measurements" element={<UserMeasurement />} />
+        <Route path="/users/:user_id/edit" element={<ShowUserData />} />
+        <Route path="/users/:user_id/measurements" element={<Measurement />} />
         <Route path="/routines" element={<Routines />} />
-        <Route path="/routines/:routineId" element={<Routine />} />
+        <Route path="/routines/:routine_id" element={<Routine />} />
         <Route path="/add-routine" element={<CreateRoutine />} />
         <Route path="/today-workout" element={<TodayWorkout />} />
         <Route path="/" element={<Navigate to="coach/dashboard" replace />} />
