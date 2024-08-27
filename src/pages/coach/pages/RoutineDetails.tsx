@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import AssignRoutineDialog from "../components/routine/AssignRoutineDialog";
 import ExerciseSetList from "../components/routine/ExerciseSetList";
+import ExerciseForm from "../components/routine/ExerciseForm";
 
 // const ITEMS_PER_PAGE = 3;
 
@@ -63,9 +64,7 @@ export default function RoutineDetails() {
   }
 
   const fetchExercises = async () => {
-    console.log('getAllRoutineIds', getAllRoutineIds());
     try {
-
       const { data, error } = await supabase
         .from("exercises")
         .select("*")
@@ -74,7 +73,6 @@ export default function RoutineDetails() {
 
       if (data) {
         setExercises(data);
-        console.log('fetchExercises', data);
         setIsLoading(false);
       }
       if (error) {
@@ -97,7 +95,6 @@ export default function RoutineDetails() {
         .in('routine_exercise_id', getAllRoutineExercisesIds());
       if (data) {
         setRoutineExerciseSet(data);
-        console.log('routineExerciseSet', routineExerciseSet);
       }
       if (error) {
         throw new Error(error.message);
@@ -144,11 +141,10 @@ export default function RoutineDetails() {
       set.id === updatedSet.id ? updatedSet : set
     );
     setRoutineExerciseSet(updatedSets);
-    const { data, error } = await supabase.from('routine_exercise_sets').update(updatedSet).eq('id', updatedSet.id);
+    const { error } = await supabase.from('routine_exercise_sets').update(updatedSet).eq('id', updatedSet.id);
     if (error) {
       toast.error(`Error updating routine exercise set: ${error.message}`);
     } else {
-      console.log(data);
       toast.success('Routine exercise set updated successfully');
     }
   };
@@ -171,6 +167,7 @@ export default function RoutineDetails() {
     const toAddExerciseSet = routineExerciseSet.filter(set => set.routine_exercise_id === routineExerciseId);
     return toAddExerciseSet[toAddExerciseSet.length - 1]?.set_number + 1 || 1;
   };
+
   const handleExerciseSetCreation = async (routineExerciseId: number) => {
     const { data, error } = await supabase
       .from('routine_exercise_sets')
@@ -184,11 +181,41 @@ export default function RoutineDetails() {
     if (error) {
       toast.error(`Error creating exercise set: ${error.message}`);
     } else if (data) {
-      console.log(data);
       fetchRoutineExerciseSet();
       toast.success("Exercise set created successfully");
     }
   }
+
+  const handleAddExerciseToRoutine = async (formData: { exercise_id: number, weight_type_id: number }) => {
+    const { error } = await supabase
+      .from('routine_exercises')
+      .insert({
+        routine_id: currentRoutineId,
+        exercise_id: formData.exercise_id,
+        weight_type_id: formData.weight_type_id,
+      })
+    if (error) {
+      toast.error(`Error adding exercise to routine: ${error.message}`);
+    } else {
+      toast.success("Exercise added to routine successfully");
+      fetchRoutineExercise();
+      setIsDialogOpen(false);
+    }
+  }
+
+  const handleExerciseDeletion = async (id: number) => {
+    try {
+      const { error } = await supabase
+        .from('routine_exercises')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+      setRoutineExercise(routineExercise.filter(exercise => exercise.id !== id));
+      toast.success("Exercise deleted successfully");
+    } catch (error) {
+      toast.error(`Error deleting exercise: ${(error as Error).message}`);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -231,9 +258,7 @@ export default function RoutineDetails() {
             <Button
               variant="destructive"
               onClick={() => {
-                if (window.confirm("¿Estás seguro de que quieres eliminar esta rutina?")) {
-                  // Add the delete routine logic here
-                  // For example:
+                if (window.confirm("¿Estás seguro de que quieres eliminar esta rutina? Se eliminara toda la información relacionada con esta rutina, menos los ejercicios.")) {
                   deleteRoutine()
                 }
               }}
@@ -258,14 +283,7 @@ export default function RoutineDetails() {
               <DialogDescription>
                 Crea una nueva serie de ejercicio para esta rutina.
               </DialogDescription>
-              {/* <ExerciseSetForm
-                exercises={exercises}
-                onSubmit={(newSet) => {
-                  handleExerciseSetCreation(newSet);
-                  setIsDialogOpen(false);
-                }}
-                routineId={currentRoutineId}
-              /> */}
+              <ExerciseForm onSubmit={handleAddExerciseToRoutine} />
             </DialogContent>
           </Dialog>
         </div>
@@ -274,7 +292,8 @@ export default function RoutineDetails() {
           routineExerciseSets={routineExerciseSet}
           exercises={exercises}
           onUpdate={handleExerciseSetUpdate}
-          onDelete={handleExerciseSetDeletion}
+          onDeleteSet={handleExerciseSetDeletion}
+          onDeleteExercise={handleExerciseDeletion}
           onAdd={handleExerciseSetCreation}
           routine_id={currentRoutineId}
         />

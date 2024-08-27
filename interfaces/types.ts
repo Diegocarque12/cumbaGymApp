@@ -67,9 +67,8 @@ export interface RoutineExerciseSet {
 }
 
 export interface WeightTypes {
-  1: "kg";
-  2: "lbs";
-  3: "pesas";
+  id: number;
+  name: string;
 }
 
 export interface WorkoutHistory {
