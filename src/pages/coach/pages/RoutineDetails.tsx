@@ -140,6 +140,7 @@ export default function RoutineDetails() {
     const updatedSets = routineExerciseSet.map(set =>
       set.id === updatedSet.id ? updatedSet : set
     );
+    // this will be make problems at moment I want to update a set number, I need to change the filter
     setRoutineExerciseSet(updatedSets);
     const { error } = await supabase.from('routine_exercise_sets').update(updatedSet).eq('id', updatedSet.id);
     if (error) {
