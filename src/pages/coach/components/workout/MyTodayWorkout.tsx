@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Exercise, Routine, RoutineExercise, RoutineExerciseSet, routineLog, UserRoutine, WorkoutHistory } from "interfaces/types";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
-const MyTodayWorkout = () => {
+const MyTodayWorkout = ({ userId }: { userId: number }) => {
     const [routines, setRoutines] = useState<Routine[]>([]);
     const [userRoutines, setUserRoutines] = useState<UserRoutine[]>([]);
     const [routineExercises, setRoutineExercises] = useState<RoutineExercise[]>([]);
@@ -44,8 +44,6 @@ const MyTodayWorkout = () => {
     }, [routineExerciseSets]);
 
     const saveWorkoutHistory = async (workoutHistoryData: Omit<WorkoutHistory, "id">) => {
-        console.log('Saving workout history:', workoutHistoryData);
-
         try {
             const { error } = await supabase
                 .from('workout_history')
@@ -59,7 +57,7 @@ const MyTodayWorkout = () => {
 
     const saveRoutineLog = async () => {
         const routineLog: Omit<routineLog, "id"> = {
-            user_id: 1,
+            user_id: userId,
             routine_id: selectedRoutineId!,
             completed_at: new Date(),
         };
@@ -80,7 +78,7 @@ const MyTodayWorkout = () => {
             const { data, error } = await supabase
                 .from("user_routines")
                 .select("*")
-                .eq("user_id", 1);
+                .eq("user_id", userId);
             if (error) {
                 throw new Error(error.message);
             }
@@ -339,7 +337,6 @@ const MyTodayWorkout = () => {
                     <tbody>
                         {sets.map((set) => (
                             <ExerciseSet key={set.id} set={set} routineExerciseId={routineExercise.id} />
-
                         ))}
                     </tbody>
                 </table>
@@ -355,7 +352,7 @@ const MyTodayWorkout = () => {
 
         const saveWorkout = () => {
             const workoutHistoryData: Omit<WorkoutHistory, 'id'> = {
-                user_id: 1,
+                user_id: userId,
                 routine_exercise_id: routineExerciseId,
                 set_number: set.set_number,
                 weight: weight,

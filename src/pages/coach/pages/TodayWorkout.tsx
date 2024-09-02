@@ -3,6 +3,7 @@ import supabase from "../../../utils/supabaseClient";
 import type { User } from "../../../../interfaces/types";
 import { useSessionStorage } from "@/hooks/useSessionStorage";
 import MyTodayWorkout from "../components/workout/MyTodayWorkout";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const TodayWorkout = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -33,27 +34,6 @@ const TodayWorkout = () => {
             setIsLoading(false);
         }
     };
-
-    /**
-     * Updates the completion status of a specific exercise set.
-     * @param index - The index of the exercise set to update.
-     * @param completed - The new completion status.
-     */
-    // const handleSetCompletion = (index: number, completed: boolean) => {
-    //     const updatedCompletedSets = [...completedSets];
-    //     updatedCompletedSets[index] = completed;
-    //     setCompletedSets(updatedCompletedSets);
-    // };
-
-
-    /**
-     * Resets the state when finishing a routine.
-     */
-    // const handleFinishRoutine = async () => {
-    //     setSelectedRoutineId(null);
-    //     setCompletedSets([]);
-    //     setIsRoutineSelected(false);
-    // };
 
     /**
      * Updates the list of unpinned users based on the current users and pinned users.
@@ -158,7 +138,7 @@ const TodayWorkout = () => {
                 </div>
             </div>
             {currentScreen === "myWorkout" && (
-                <MyTodayWorkout />
+                <MyTodayWorkout userId={1} />
             )}
             {currentScreen === "presentUsers" && (
                 <div className="flex flex-col">
@@ -177,18 +157,31 @@ const TodayWorkout = () => {
                                 <span>¡Aún no hay usuarios fijados!</span>
                             </div>
                         )}
-                        {pinnedUsers.length > 0 && pinnedUsers.map((user) => (
-                            <div key={user.id} className="mb-8 p-8 w-full sm:w-1/2 md:w-1/3 bg-gray-300 rounded-lg m-2 relative ">
-                                <button className="absolute top-2 right-2" onClick={() => handleUnPinUser(user)}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 absolute top-2 right-2 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5l-6.46 6.46a2 2 0 0 0 0 2.83L15 21" />
-                                    </svg>
-                                </button>
-                                <div>
-                                    <p className="text-lg font-semibold">{user.name}</p>
-                                    <p className="text-gray-600">{user.last_name}</p>
-                                </div>
-                            </div>
+                        {pinnedUsers.length > 0 && pinnedUsers.map((user, index) => (
+                            <Dialog key={index}>
+                                <DialogTrigger asChild>
+                                    <div key={user.id} className="mb-4 p-8 w-full sm:w-1/2 md:w-1/3 bg-gray-400 rounded-lg m-2 relative cursor-pointer hover:bg-gray-500">
+                                        <button className="absolute top-2 right-2" onClick={(e) => { e.stopPropagation(); handleUnPinUser(user); }}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 absolute top-2 right-2 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5l-6.46 6.46a2 2 0 0 0 0 2.83L15 21" />
+                                            </svg>
+                                        </button>
+                                        <div>
+                                            <p className="text-lg font-semibold">{user.name}</p>
+                                            <p className="text-gray-800">{user.last_name}</p>
+                                        </div>
+                                    </div>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-[625px] h-full overflow-y-scroll ">
+                                    <DialogHeader className="h-auto">
+                                        <DialogTitle>{user.name} {user.last_name}</DialogTitle>
+                                        <DialogDescription>
+                                            Información de rutinas
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <MyTodayWorkout userId={user.id || 0} />
+                                </DialogContent>
+                            </Dialog>
                         ))}
                     </div>
                     <div className="flex flex-wrap justify-center pt-8 border-t-2 border-gray-300 pb-4 ">
