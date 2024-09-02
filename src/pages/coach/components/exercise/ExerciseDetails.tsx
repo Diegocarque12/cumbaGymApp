@@ -9,6 +9,11 @@ interface ExerciseDetailsProps {
 }
 
 const ExerciseDetails = ({ exercise, onClose, open }: ExerciseDetailsProps) => {
+    const getYouTubeVideoId = (videoUrl: string) => {
+        const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?([a-zA-Z0-9_-]{11})/;
+        const match = videoUrl.match(regex);
+        return match ? match[1] : null;
+    }
     return (
         <Dialog open={open} onOpenChange={onClose}>
             <DialogHeader>
@@ -50,7 +55,14 @@ const ExerciseDetails = ({ exercise, onClose, open }: ExerciseDetailsProps) => {
                     {exercise.video_url && (
                         <div className="mt-6 sm:mt-8 bg-white p-4 rounded-lg shadow-md">
                             <span className="text-lg sm:text-xl font-bold mb-4 text-gray-800 border-b pb-2">Video demostrativo</span>
-                            <video src={exercise.video_url} controls className="w-full rounded-lg shadow-sm"></video>
+                            <iframe
+                                src={`https://www.youtube.com/embed/${getYouTubeVideoId(exercise.video_url)}`}
+                                title="YouTube video player"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                className="w-full aspect-video rounded-lg shadow-sm mt-2"
+                            ></iframe>
                         </div>
                     )}
                     {exercise.image_url && (
