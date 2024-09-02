@@ -32,7 +32,6 @@ const ExerciseSetList = ({
             {routineExercises.map((routineExercise) => {
                 const exercise = exercises.find(e => e.id === routineExercise.exercise_id);
                 const sets = routineExerciseSets.filter(set => set.routine_exercise_id === routineExercise.id);
-
                 return (
                     <div key={routineExercise.id} className="mb-6 border p-4 rounded-lg">
                         <div className="flex justify-between items-center mb-4">

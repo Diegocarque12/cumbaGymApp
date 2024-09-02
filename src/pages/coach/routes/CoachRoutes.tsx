@@ -9,6 +9,7 @@ import Users from "../pages/Users";
 import Dashboard from "../pages/Dashboard";
 import Measurement from "../pages/Measurement";
 import ShowUserData from "../components/users/ShowUserData";
+import WorkoutDone from "../pages/WorkoutDone";
 
 const CouchRoutes = () => {
   return (
@@ -26,6 +27,7 @@ const CouchRoutes = () => {
         <Route path="/routines/:routine_id" element={<Routine />} />
         <Route path="/add-routine" element={<CreateRoutine />} />
         <Route path="/today-workout" element={<TodayWorkout />} />
+        <Route path="/workout-done" element={<WorkoutDone />} />
         <Route path="/" element={<Navigate to="coach/dashboard" replace />} />
       </Routes>
     </>

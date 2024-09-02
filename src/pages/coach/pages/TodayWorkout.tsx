@@ -1,64 +1,21 @@
 import { useState, useEffect } from "react";
 import supabase from "../../../utils/supabaseClient";
-import type { Routine, User } from "../../../../interfaces/types";
+import type { User } from "../../../../interfaces/types";
 import { useSessionStorage } from "@/hooks/useSessionStorage";
+import MyTodayWorkout from "../components/workout/MyTodayWorkout";
 
 const TodayWorkout = () => {
-    const [routines, setRoutines] = useState<Routine[]>([]);
-    const [selectedRoutineId, setSelectedRoutineId] = useState<number | null>(null);
-    const [completedSets, setCompletedSets] = useState<boolean[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [isRoutineSelected, setIsRoutineSelected] = useState(false);
     const [currentScreen, setCurrentScreen] = useSessionStorage('currentScreen', 'myWorkout');
     const [users, setUsers] = useState<User[]>([]);
     const [unPinnedUsers, setUnPinnedUsers] = useState<User[]>([]);
     const [pinnedUsers, setPinnedUsers] = useState<User[]>([]);
     const [filtedUsers, setFiltedUsers] = useState<User[]>([]);
 
-    useEffect(() => {
-        fetchRoutines();
-        fetchUsers();
-        console.log(completedSets);
 
-    }, []);
 
-    useEffect(() => {
-        handleUnPinnedUsers();
-    }, [users, pinnedUsers])
-
-    useEffect(() => {
-        const storedPinnedUsers = sessionStorage.getItem('pinnedUsers')
-        if (storedPinnedUsers) {
-            setPinnedUsers(JSON.parse(storedPinnedUsers))
-        } else {
-            sessionStorage.setItem('pinnedUsers', JSON.stringify(pinnedUsers))
-        }
-    }, [])
-
-    /**
-     * Fetches routines from the database and updates the state.
-     * If an error occurs, it sets an error message.
-     */
-    const fetchRoutines = async () => {
-        try {
-            const { data: routinesData, error: routinesError } = await supabase.from("routines").select("*");
-
-            if (routinesError) {
-                throw new Error(routinesError.message);
-            }
-            setRoutines(routinesData as Routine[]);
-        } catch (err) {
-            setError("Error al obtener las rutinas");
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    /**
-     * Fetches non-deleted users from the database and updates the state.
-     * If an error occurs, it sets an error message.
-     */
+    // get all the users that are not deleted
     const fetchUsers = async () => {
         try {
             const { data, error } = await supabase
@@ -75,71 +32,6 @@ const TodayWorkout = () => {
         } finally {
             setIsLoading(false);
         }
-    };
-
-    /**
-     * Fetches exercise sets for a given routine ID, including exercise names.
-     * Updates the state with the fetched data and initializes completion status.
-     * @param routine_id - The ID of the routine to fetch exercise sets for.
-     */
-    const fetchExerciseSets = async (routine_id: number) => {
-        try {
-            const { data: routineExercisesData, error: exerciseSetsError } = await supabase
-                .from("routine_exercises")
-                .select("*")
-                .eq("routine_id", routine_id);
-
-            if (exerciseSetsError) {
-                throw new Error(exerciseSetsError.message);
-            }
-
-            const exerciseSetsWithNames = await Promise.all(
-                routineExercisesData.map(async (exerciseSet) => {
-                    const exercise_name = await getExerciseName(exerciseSet.exercise_id);
-                    return { ...exerciseSet, exercise_name };
-                })
-            );
-
-            setCompletedSets(new Array(exerciseSetsWithNames.length).fill(false));
-        } catch (error) {
-            console.error("Error al obtener los sets de ejercicios:", error);
-        }
-    };
-
-    /**
-     * Retrieves the name of an exercise by its ID from the database.
-     * @param exercise_id - The ID of the exercise to fetch the name for.
-     * @returns The name of the exercise or an empty string if an error occurs.
-     */
-    const getExerciseName = async (exercise_id: number) => {
-        try {
-            const { data, error } = await supabase
-                .from("exercises")
-                .select("name")
-                .eq("id", exercise_id)
-                .single();
-
-            if (error) {
-                throw new Error(error.message);
-            }
-
-            return data.name;
-        } catch (error) {
-            console.error("Error al obtener el nombre del ejercicio:", error);
-            return "";
-        }
-    };
-
-    /**
-     * Handles the change of selected routine.
-     * Fetches exercise sets for the selected routine and updates the state.
-     * @param event - The change event from the routine select element.
-     */
-    const handleRoutineChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const routine_id = parseInt(event.target.value);
-        setSelectedRoutineId(routine_id);
-        await fetchExerciseSets(routine_id);
-        setIsRoutineSelected(true);
     };
 
     /**
@@ -219,6 +111,23 @@ const TodayWorkout = () => {
         setFiltedUsers(filteredUsers);
     }
 
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+
+    useEffect(() => {
+        handleUnPinnedUsers();
+    }, [users, pinnedUsers])
+
+    useEffect(() => {
+        const storedPinnedUsers = sessionStorage.getItem('pinnedUsers')
+        if (storedPinnedUsers) {
+            setPinnedUsers(JSON.parse(storedPinnedUsers))
+        } else {
+            sessionStorage.setItem('pinnedUsers', JSON.stringify(pinnedUsers))
+        }
+    }, [])
+
     if (isLoading) {
         return <div>Cargando...</div>;
     }
@@ -249,129 +158,7 @@ const TodayWorkout = () => {
                 </div>
             </div>
             {currentScreen === "myWorkout" && (
-                <>
-                    <h2 className="text-2xl font-bold">Rutina del día</h2>
-                    {!isRoutineSelected && (
-                        <div className="mb-4">
-                            <select
-                                className="block w-full px-4 py-2 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                value={selectedRoutineId || ""}
-                                onChange={handleRoutineChange}
-                            >
-                                <option value="">Seleccionar rutina</option>
-                                {routines.map((routine) => (
-                                    <option key={routine.id} value={routine.id}>
-                                        {routine.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    )}
-                    {/* {exerciseSets.length > 0 && isRoutineSelected && (
-                        <>
-                            <div className="flex items-center mb-4 justify-between">
-
-                                <h2 className="text-xl font-semibold mb-4">{routines.find(routine => routine.id === selectedRoutineId)?.name}</h2>
-                                {isRoutineSelected && (
-                                    <button
-                                        onClick={() => setIsRoutineSelected(!isRoutineSelected)}
-                                        className="ml-2 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                        </svg>
-                                    </button>
-                                )}
-                            </div>
-                            <h3 className="text-xl font-semibold mb-2">Lista de Ejercicios</h3>
-                            {exerciseSets.map((exerciseSet, exerciseIndex) => (
-                                <div key={exerciseSet.id} className="mb-8">
-                                    <h3 className="text-xl font-semibold mb-2">Ejercicio: {exerciseSet.exercise_name}</h3>
-                                    {Array.from({ length: exerciseSet.setnumber }).map((_, setIndex) => (
-                                        <div key={`${exerciseSet.id}-${setIndex}`} className="bg-gray-100 p-4 rounded-lg mb-4">
-                                            <p className="text-lg font-medium mb-2">Set: {setIndex + 1}</p>
-                                            <div className="flex justify-between mb-2">
-                                                <div>
-                                                    <label htmlFor={`weight-${exerciseIndex}-${setIndex}`} className="mr-2">
-                                                        Peso:
-                                                    </label>
-                                                    <input
-                                                        type="number"
-                                                        id={`weight-${exerciseIndex}-${setIndex}`}
-                                                        className="w-20 px-2 py-1 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                        value={exerciseSet.weight}
-                                                        onChange={(e) =>
-                                                            handleWeightChange(exerciseIndex, parseInt(e.target.value))
-                                                        }
-                                                        disabled={completedSets[exerciseIndex * exerciseSet.setnumber + setIndex]}
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <label htmlFor={`repetitions-${exerciseIndex}-${setIndex}`} className="mr-2">
-                                                        Repeticiones:
-                                                    </label>
-                                                    <input
-                                                        type="number"
-                                                        id={`repetitions-${exerciseIndex}-${setIndex}`}
-                                                        className="w-20 px-2 py-1 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                        value={exerciseSet.repetitions}
-                                                        onChange={(e) =>
-                                                            handleRepetitionsChange(exerciseIndex, parseInt(e.target.value))
-                                                        }
-                                                        disabled={completedSets[exerciseIndex * exerciseSet.setnumber + setIndex]}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <label className="flex items-center">
-                                                <input
-                                                    type="checkbox"
-                                                    className="form-checkbox h-5 w-5 text-blue-600"
-                                                    checked={completedSets[exerciseIndex * exerciseSet.setnumber + setIndex] || false}
-                                                    onChange={(e) =>
-                                                        handleSetCompletion(
-                                                            exerciseIndex * exerciseSet.setnumber + setIndex,
-                                                            e.target.checked
-                                                        )
-                                                    }
-                                                />
-                                                <span className="ml-2">Completado</span>
-                                            </label>
-                                        </div>
-                                    ))}
-                                </div>
-                            ))}
-                            <button
-                                className="block w-full px-4 py-2 mt-4 text-white bg-blue-500 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                onClick={handleFinishRoutine}
-                            >
-                                Terminar rutina
-                            </button>
-                        </>
-                    )}
-                    {
-                        exerciseSets.length === 0 && isRoutineSelected && (
-                            <>
-                                <div className="mb-4">
-                                    <select
-                                        className="block w-full px-4 py-2 rounded-lg bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        value={selectedRoutineId || ""}
-                                        onChange={handleRoutineChange}
-                                    >
-                                        <option value="">Seleccionar rutina</option>
-                                        {routines.map((routine) => (
-                                            <option key={routine.id} value={routine.id}>
-                                                {routine.name}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-lg font-semibold mb-2">No hay ejercicios para esta rutina.</p>
-                                </div>
-                            </>
-                        )
-                    } */}
-                </>
+                <MyTodayWorkout />
             )}
             {currentScreen === "presentUsers" && (
                 <div className="flex flex-col">

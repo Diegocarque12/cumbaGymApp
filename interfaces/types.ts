@@ -80,3 +80,10 @@ export interface WorkoutHistory {
   set_number: number;
   date_completed: Date;
 }
+
+export interface routineLog {
+  id: number;
+  user_id: number;
+  routine_id: number;
+  completed_at: Date;
+}
