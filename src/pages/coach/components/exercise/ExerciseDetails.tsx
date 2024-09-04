@@ -9,10 +9,22 @@ interface ExerciseDetailsProps {
 }
 
 const ExerciseDetails = ({ exercise, onClose, open }: ExerciseDetailsProps) => {
-    const getYouTubeVideoId = (videoUrl: string) => {
-        const regex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?([a-zA-Z0-9_-]{11})/;
-        const match = videoUrl.match(regex);
-        return match ? match[1] : null;
+    const getVideoEmbedUrl = (videoUrl: string): string | undefined => {
+        const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=)?([a-zA-Z0-9_-]{11})/;
+        const tiktokRegex = /(?:https?:\/\/)?(?:(?:www|vm)\.)?(?:tiktok\.com)\/(?:(@[\w.-]+\/video\/(\d+))|([A-Za-z0-9]+))/;
+
+        const youtubeMatch = videoUrl.match(youtubeRegex);
+        if (youtubeMatch) {
+            return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+        }
+
+        const tiktokMatch = videoUrl.match(tiktokRegex);
+        if (tiktokMatch) {
+            const videoId = tiktokMatch[2] || tiktokMatch[3];
+            return `https://www.tiktok.com/embed/v2/${videoId}`;
+        }
+
+        return undefined;
     }
     return (
         <Dialog open={open} onOpenChange={onClose}>
@@ -56,8 +68,8 @@ const ExerciseDetails = ({ exercise, onClose, open }: ExerciseDetailsProps) => {
                         <div className="mt-6 sm:mt-8 bg-white p-4 rounded-lg shadow-md">
                             <span className="text-lg sm:text-xl font-bold mb-4 text-gray-800 border-b pb-2">Video demostrativo</span>
                             <iframe
-                                src={`https://www.youtube.com/embed/${getYouTubeVideoId(exercise.video_url)}`}
-                                title="YouTube video player"
+                                src={getVideoEmbedUrl(exercise.video_url)}
+                                title="Video player"
                                 frameBorder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowFullScreen
@@ -84,5 +96,4 @@ const ExerciseDetails = ({ exercise, onClose, open }: ExerciseDetailsProps) => {
         </Dialog >
     );
 }
-
 export default ExerciseDetails;
