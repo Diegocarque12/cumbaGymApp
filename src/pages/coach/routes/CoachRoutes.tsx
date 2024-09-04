@@ -8,8 +8,9 @@ import Exercises from "../pages/Exercises";
 import Users from "../pages/Users";
 import Dashboard from "../pages/Dashboard";
 import Measurement from "../pages/Measurement";
-import ShowUserData from "../components/users/ShowUserData";
+import UserDetails from "../components/users/UserDetails";
 import WorkoutDone from "../pages/WorkoutDone";
+import UserRoutinesDetails from "../components/users/UserRoutinesDetails";
 
 const CouchRoutes = () => {
   return (
@@ -21,7 +22,8 @@ const CouchRoutes = () => {
         <Route path="/exercises/:exercise_id" element={<Exercises />} />
         <Route path="/exercises/:exercise_id/edit" element={<Exercises />} />
         <Route path="/users" element={<Users />} />
-        <Route path="/users/:user_id/edit" element={<ShowUserData />} />
+        <Route path="/users/:user_id/edit" element={<UserDetails />} />
+        <Route path="/users/:user_id/routines" element={<UserRoutinesDetails />} />
         <Route path="/users/:user_id/measurements" element={<Measurement />} />
         <Route path="/routines" element={<Routines />} />
         <Route path="/routines/:routine_id" element={<Routine />} />
