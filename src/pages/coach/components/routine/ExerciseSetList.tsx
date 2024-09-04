@@ -50,9 +50,9 @@ const ExerciseSetList = ({
                             <thead>
                                 <tr className="bg-gray-100">
                                     <th className="border p-2 text-left">Set</th>
-                                    <th className="border p-2 text-left">Suggested Weight</th>
-                                    <th className="border p-2 text-left">Suggested Repetitions</th>
-                                    <th className="border p-2 text-left">Actions</th>
+                                    <th className="border p-2 text-left">Peso sugerido</th>
+                                    <th className="border p-2 text-left">Repeticiones sugeridas</th>
+                                    <th className="border p-2 text-left">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -71,11 +71,11 @@ const ExerciseSetList = ({
                                                 }}
                                             >
                                                 <DialogTrigger asChild>
-                                                    <Button variant="outline" className="mr-2" onClick={() => { setEditingSet(set) }}>Edit</Button>
+                                                    <Button variant="outline" className="mr-2" onClick={() => { setEditingSet(set) }}>Editar</Button>
                                                 </DialogTrigger>
                                                 <DialogContent>
                                                     <DialogHeader>
-                                                        <DialogTitle>Edit Exercise Set</DialogTitle>
+                                                        <DialogTitle>Editar el set de ejercicio</DialogTitle>
                                                     </DialogHeader>
                                                     {editingSet && (
                                                         <ExerciseSetForm
@@ -92,14 +92,14 @@ const ExerciseSetList = ({
                                                 if (set.id) {
                                                     onDeleteSet(set.id)
                                                 }
-                                            }}>Delete</Button>
+                                            }}>Eliminar</Button>
                                         </td>
                                     </tr>
                                 ))}
                                 <tr>
                                     <td colSpan={4}>
                                         <Button className="w-full" onClick={() => onAdd(routineExercise.id)}>
-                                            Add Set
+                                            Agregar Set
                                         </Button>
                                     </td>
                                 </tr>
