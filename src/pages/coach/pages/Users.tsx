@@ -20,6 +20,8 @@ const Users = () => {
 	const [userRoutines, setUserRoutines] = useState<Routine[]>([]);
 	const [userMeasurements, setUserMeasurements] = useState<UserMeasurement[]>([]);
 	const [searchTerm, setSearchTerm] = useState("");
+	const sortedUsers = [...users].sort((a, b) => a.name.localeCompare(b.name));
+
 
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -125,7 +127,7 @@ const Users = () => {
 					/>
 				</div>
 				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-					{users
+					{sortedUsers
 						.filter((user) =>
 							user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
 							user.last_name.toLowerCase().includes(searchTerm.toLowerCase())

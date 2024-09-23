@@ -6,6 +6,8 @@ import type { Routine } from "../../../../interfaces/types";
 
 const RoutineList = () => {
   const [routineList, setRoutinesList] = useState<Routine[]>([]);
+  const sortedRoutines = [...routineList].sort((a, b) => a.name.localeCompare(b.name));
+
 
   useEffect(() => {
     fetchRoutines();
@@ -32,7 +34,7 @@ const RoutineList = () => {
         </Link>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {routineList.map((routine) => (
+        {sortedRoutines.map((routine) => (
           <Link
             key={routine.id}
             to={`/coach/routines/${routine.id}`}

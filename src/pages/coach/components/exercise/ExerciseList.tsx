@@ -7,7 +7,10 @@ interface ExerciseListProps {
     onDelete: (id: string) => void;
 }
 
+
+
 const ExerciseList = ({ exercises, onView, onEdit, onDelete }: ExerciseListProps) => {
+    const sortedExercises = [...exercises].sort((a, b) => a.name.localeCompare(b.name));
     return (
         <table className="w-full border-collapse">
             <thead>
@@ -17,7 +20,7 @@ const ExerciseList = ({ exercises, onView, onEdit, onDelete }: ExerciseListProps
                 </tr>
             </thead>
             <tbody>
-                {exercises.map((exercise) => (
+                {sortedExercises.map((exercise) => (
                     <tr key={exercise.id} className="border-b">
                         <td className="border p-2 text-lg font-semibold">{exercise.name}</td>
                         <td className="border p-2">

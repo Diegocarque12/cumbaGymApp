@@ -2,6 +2,7 @@ import supabase from "@/utils/supabaseClient";
 import { useEffect, useState } from "react";
 import { Exercise, Routine, RoutineExercise, RoutineExerciseSet, routineLog, UserRoutine, WorkoutHistory } from "interfaces/types";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { GetAcronymWeightType } from "@/utils/WeightType";
 
 const MyTodayWorkout = ({ userId }: { userId: number }) => {
     const [routines, setRoutines] = useState<Routine[]>([]);
@@ -336,7 +337,7 @@ const MyTodayWorkout = ({ userId }: { userId: number }) => {
                     </thead>
                     <tbody>
                         {sets.map((set) => (
-                            <ExerciseSet key={set.id} set={set} routineExerciseId={routineExercise.id} />
+                            <ExerciseSet key={set.id} set={set} routineExerciseId={routineExercise.id} weightTypeId={routineExercise.weight_type_id} />
                         ))}
                     </tbody>
                 </table>
@@ -344,7 +345,7 @@ const MyTodayWorkout = ({ userId }: { userId: number }) => {
         </div>
     )
 
-    const ExerciseSet = ({ set, routineExerciseId }: { set: RoutineExerciseSet, routineExerciseId: number }) => {
+    const ExerciseSet = ({ set, routineExerciseId, weightTypeId }: { set: RoutineExerciseSet, routineExerciseId: number, weightTypeId: number }) => {
         const [weight, setWeight] = useState(set.suggested_weight);
         const [reps, setReps] = useState(set.suggested_repetitions);
         const [isEditingSet, setIsEditingSet] = useState(false);
@@ -368,7 +369,7 @@ const MyTodayWorkout = ({ userId }: { userId: number }) => {
                     <tr key={set.id} className="border-b">
                         <td className="p-2 text-gray-700 font-semibold text-center">Set {set.set_number}</td>
                         <td className="p-2 text-gray-700 text-center">{reps} reps</td>
-                        <td className="p-2 text-gray-700 text-center">{weight} kg</td>
+                        <td className="p-2 text-gray-700 text-center">{weight} {GetAcronymWeightType(weightTypeId)}</td>
                         <td className="p-2 text-center">
                             <input
                                 type="checkbox"
