@@ -58,6 +58,7 @@ const ExerciseSetList = ({
             {routineExercises.map((routineExercise) => {
                 const exercise = exercises.find(e => e.id === routineExercise.exercise_id);
                 const sets = routineExerciseSets.filter(set => set.routine_exercise_id === routineExercise.id);
+                const sortedSets = sets.sort((a, b) => a.set_number - b.set_number);
                 return (
                     <div key={routineExercise.id} className="mb-6 border p-4 rounded-lg">
                         <div className="flex justify-between items-center mb-4">
@@ -132,7 +133,7 @@ const ExerciseSetList = ({
                                 </tr>
                             </thead>
                             <tbody>
-                                {sets.map((set) => (
+                                {sortedSets.map((set) => (
                                     <tr key={set.id} className="hover:bg-gray-50">
                                         <td className="border p-2">{set.set_number}</td>
                                         <td className="border p-2">{set.suggested_weight}</td>
