@@ -41,7 +41,7 @@ const Dashboard = () => {
           <h1 className="text-3xl font-bold text-text-100">Dashboard del Entrenador</h1>
         </div>
       </header>
-      <main className="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <main className="container max-w-7xl py-6 px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <div className="bg-bg-100 overflow-hidden shadow-lg rounded-lg transition-all duration-300 hover:shadow-xl">
             <div className="px-6 py-8">
