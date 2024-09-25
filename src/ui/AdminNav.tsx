@@ -1,3 +1,4 @@
+import React from "react";
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import supabase from "../utils/supabaseClient";
@@ -6,10 +7,17 @@ const Nav = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     setIsOpen(false);
+    fetchUser();
   }, [location]);
+
+  const fetchUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUser(user);
+  };
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -25,17 +33,15 @@ const Nav = () => {
   };
 
   return (
-    <nav className="bg-gray-800 text-white">
+    <nav className="bg-primary-100 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-28">
           <div className="flex items-center justify-between w-full">
             <Link
               to='/coach/dashboard'
               className='flex items-center space-x-3 rtl:space-x-reverse'
             >
-              <span className='self-center text-2xl font-semibold whitespace-nowrap'>
-                CumbaGym
-              </span>
+              <img src="/assets/CUMBASGYM-blanco.png" alt="CUMBASGYM Logo" className="h-24 w-auto" />
             </Link>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
@@ -46,7 +52,7 @@ const Nav = () => {
                 <NavLink to="/coach/users" label="Usuarios" />
                 <button
                   onClick={handleLogout}
-                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700"
+                  className="px-3 py-2 rounded-md text-sm font-medium hover:bg-bg-500"
                 >
                   Cerrar sesión
                 </button>
@@ -56,16 +62,12 @@ const Nav = () => {
               <button
                 onClick={toggleMenu}
                 type="button"
-                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
+                className="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-gray-900 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-gray-300"
                 aria-controls="mobile-menu"
                 aria-expanded={isOpen}
               >
                 <span className="sr-only">Abrir menú</span>
-                {isOpen ? (
-                  <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                ) : (
+                {!isOpen && (
                   <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
                   </svg>
@@ -76,16 +78,43 @@ const Nav = () => {
         </div>
 
         {isOpen && (
-          <div className="md:hidden" id="mobile-menu">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <div className="md:hidden fixed inset-0 z-50 bg-black bg-opacity-50 backdrop-blur-sm flex justify-end">
+            <div className="w-[90%] space-y-1 sm:px-3 bg-white h-full flex flex-col">
+              <div className="bg-accent-200">
+                <div className="flex justify-end m-2">
+                  <button
+                    onClick={toggleMenu}
+                    type="button"
+                    className="inline-flex items-center justify-center p-2 rounded-md text-white hover:text-gray-900 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-gray-300"
+                  >
+                    <span className="sr-only">Cerrar menú</span>
+                    <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                {user && (
+                  <div className="p-4 rounded-lg mb-4">
+                    <div className="flex items-center space-x-3">
+                      <img src="/assets/CUMBASGYM-blanco.png" alt="User Avatar" className="w-16 h-16 rounded-full" />
+                      <div className="flex flex-col">
+
+                        <span className="text-lg font-semibold">Christian Ulloa</span>
+                        <span className="text-lg font-semibold">{user.email}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
               <MobileNavLink to="/coach/dashboard" label="Inicio" />
               <MobileNavLink to="/coach/routines" label="Rutinas" />
               <MobileNavLink to="/coach/exercises" label="Ejercicios" />
               <MobileNavLink to="/coach/today-workout" label="Rutina de hoy" />
               <MobileNavLink to="/coach/users" label="Usuarios" />
+              <div className="border-t border-bg-500 my-4"></div>
               <button
                 onClick={handleLogout}
-                className="w-full text-left px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700"
+                className="pl-6 block px-3 py-3 rounded-md text-lg font-medium bg-white hover:bg-gray-100 text-gray-800 opacity-80 text-left hover:text-red-700"
               >
                 Cerrar sesión
               </button>
@@ -103,8 +132,8 @@ const NavLink = ({ to, label }: { to: string; label: string }) => {
     <Link
       to={to}
       className={`px-3 py-2 rounded-md text-sm font-medium ${location.pathname === to
-        ? "bg-gray-900 text-white"
-        : "text-gray-300 hover:bg-gray-700 hover:text-white"
+        ? "bg-gray-200 text-gray-900"
+        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
         }`}
     >
       {label}
@@ -117,14 +146,13 @@ const MobileNavLink = ({ to, label }: { to: string; label: string }) => {
   return (
     <Link
       to={to}
-      className={`block px-3 py-2 rounded-md text-base font-medium ${location.pathname === to
-        ? "bg-gray-900 text-white"
-        : "text-gray-300 hover:bg-gray-700 hover:text-white"
+      className={`pl-6 block px-3 py-3 rounded-md text-lg font-medium ${location.pathname === to
+        ? "bg-gray-200 text-accent-200"
+        : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
         }`}
     >
       {label}
     </Link>
   );
 };
-
 export default Nav;
