@@ -45,13 +45,14 @@ const LoginPage = () => {
   return (
     <>
       <div className="min-h-screen flex items-center justify-center bg-background dark:bg-black relative">
-        <img src="https://i.blogs.es/410bab/danielle-cerullo-cqfnt66ttzm-unsplash/1366_2000.webp" alt="Background" className="absolute inset-0 object-cover opacity-80 w-full h-full" />
-        <div className="bg-card dark:bg-card-foreground shadow-lg rounded-lg p-8 w-full max-w-md relative z-10">
-          <h2 className="text-3xl font-bold text-primary dark:text-primary-foreground mb-6 text-center">👋 Hola de nuevo!</h2>
-          {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
-          <form onSubmit={handleLogin}>
-            <div className="mb-4">
-              <label htmlFor="email" className="block mb-2 font-bold text-gray-700">
+        <div className="absolute inset-0 bg-black opacity-90"></div>
+        <img src="https://i.blogs.es/410bab/danielle-cerullo-cqfnt66ttzm-unsplash/1366_2000.webp" alt="Background" className="absolute inset-0 object-cover w-full h-full opacity-80" />
+        <div className="bg-bg-100 dark:bg-bg-900 shadow-lg rounded-lg p-8 w-full max-w-md relative z-10 mx-4 sm:mx-0">
+          <img src="/primary-logo.svg" alt="Primary Logo" className="mb-6 mx-auto w-48" />
+          {error && <p className="text-accent-500 mb-4 text-center">{error}</p>}
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div>
+              <label htmlFor="email" className="block mb-2 font-semibold text-text-100 dark:text-text-900">
                 Correo electrónico
               </label>
               <input
@@ -59,13 +60,13 @@ const LoginPage = () => {
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                className="w-full px-4 py-3 placeholder-text-200 dark:placeholder-text-700 bg-bg-200 dark:bg-bg-800 border border-bg-300 dark:border-bg-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
                 placeholder="Ingresa tu correo electrónico"
                 required
               />
             </div>
-            <div className="mb-6">
-              <label htmlFor="password" className="block mb-2 font-bold text-gray-700">
+            <div>
+              <label htmlFor="password" className="block mb-2 font-semibold text-text-100 dark:text-text-900">
                 Contraseña
               </label>
               <input
@@ -73,25 +74,29 @@ const LoginPage = () => {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                className="w-full px-4 py-3 placeholder-text-200 dark:placeholder-text-700 bg-bg-200 dark:bg-bg-800 border border-bg-300 dark:border-bg-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
                 placeholder="Ingresa tu contraseña"
                 required
               />
             </div>
-            <div className="mb-4 flex items-center">
+            <div className="flex items-center">
               <input
                 type="checkbox"
                 id="rememberSession"
                 checked={rememberSession}
                 onChange={(e) => setRememberSession(e.target.checked)}
-                className="mr-2"
+                className="w-4 h-4 text-primary-500 border-bg-300 rounded focus:ring-primary-500"
               />
-              <label htmlFor="rememberSession" className="text-sm text-gray-700">
+              <label htmlFor="rememberSession" className="ml-2 text-sm text-text-100 dark:text-text-900">
                 Recordar sesión
               </label>
             </div>
-
-            <button type="submit" className="w-full bg-accent text-accent-foreground p-3 rounded-lg hover:bg-accent/80 transition-colors duration-500 transform hover:scale-105 font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-accent focus:ring-opacity-50">Iniciar Sesión</button>          </form>
+            <button
+              type="submit"
+              className="w-full bg-primary-100 text-white p-3 rounded-lg hover:bg-accent-200 active:bg-accent-700 transition-all duration-300 transform hover:scale-102 active:scale-98 font-semibold shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-opacity-50 uppercase tracking-wide"            >
+              Iniciar Sesión
+            </button>
+          </form>
         </div>
       </div>
     </>
