@@ -28,7 +28,7 @@ const UserDetails = () => {
     const fetchUserData = async () => {
         if (user_id) {
             const { data, error } = await supabase
-                .from('users')
+                .from('profiles')
                 .select('*')
                 .eq('id', user_id)
                 .single();
@@ -60,7 +60,7 @@ const UserDetails = () => {
     const updateUserData = async (updatedData: Partial<User>) => {
         if (user_id) {
             const { error } = await supabase
-                .from('users')
+                .from('profiles')
                 .update(updatedData)
                 .eq('id', user_id);
             if (error) console.error('Error updating user data:', error);
@@ -71,7 +71,7 @@ const UserDetails = () => {
     const handleDeactivateUser = async () => {
         if (user_id) {
             const { error } = await supabase
-                .from('users')
+                .from('profiles')
                 .update({ is_active: false })
                 .eq('id', user_id);
             if (error) console.error('Error deactivating user:', error);
@@ -84,7 +84,7 @@ const UserDetails = () => {
     const handleDeleteUser = async () => {
         if (user_id) {
             const { error } = await supabase
-                .from('users')
+                .from('profiles')
                 .update({ deleted_at: new Date().toISOString() })
                 .eq('id', user_id);
             if (error) console.error('Error deleting user:', error);

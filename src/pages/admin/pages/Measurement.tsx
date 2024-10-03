@@ -30,7 +30,7 @@ const Measurement = () => {
 	useEffect(() => {
 		const fetchCurrentUser = async () => {
 			const { data, error } = await supabase
-				.from('users')
+				.from('profiles')
 				.select('*')
 				.eq('id', user_id)
 				.single()

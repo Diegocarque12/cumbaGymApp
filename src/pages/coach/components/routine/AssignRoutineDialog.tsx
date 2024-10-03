@@ -28,7 +28,7 @@ const AssignRoutineDialog = ({ routine_id }: AssignRoutineDialogProps) => {
         const assignedUserIds = assignedUsers?.map(user => user.user_id) || [];
 
         const { data: availableUsers } = await supabase
-            .from('users')
+            .from('profiles')
             .select('id, name')
             .is('deleted_at', null)
             .not('id', 'in', `(${assignedUserIds.join(',')})`)

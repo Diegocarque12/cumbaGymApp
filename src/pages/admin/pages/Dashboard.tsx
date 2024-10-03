@@ -12,11 +12,6 @@ const Dashboard = () => {
   }, []);
 
   const fetchData = async () => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    console.log(session);
-
     try {
       const { count: userCountData } = await supabase
         .from("profiles")

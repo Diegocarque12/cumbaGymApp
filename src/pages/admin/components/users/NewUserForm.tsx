@@ -6,7 +6,7 @@ import { useState } from "react";
 const NewUserForm = () => {
     const [newUser, setNewUser] = useState<User>({
         national_id: "",
-        name: "",
+        first_name: "",
         last_name: "",
         age: 0,
         goal: "",
@@ -26,7 +26,7 @@ const NewUserForm = () => {
             }
             setNewUser({
                 national_id: "",
-                name: "",
+                first_name: "",
                 last_name: "",
                 age: 0,
                 goal: "",
@@ -77,7 +77,7 @@ const NewUserForm = () => {
                         type="text"
                         id="name"
                         name="name"
-                        value={newuser.first_name}
+                        value={newUser.first_name}
                         onChange={handleInputChange}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     />

@@ -20,9 +20,7 @@ const Users = () => {
 	const [userRoutines, setUserRoutines] = useState<Routine[]>([]);
 	const [userMeasurements, setUserMeasurements] = useState<UserMeasurement[]>([]);
 	const [searchTerm, setSearchTerm] = useState("");
-	console.log(...users);
 	const sortedUsers = [...users].sort((a, b) => a.first_name.localeCompare(b.first_name));
-
 
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
