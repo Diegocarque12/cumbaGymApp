@@ -23,7 +23,7 @@ const TodayWorkout = () => {
                 .from("profiles")
                 .select("*")
                 .is("deleted_at", null)
-                .order("name", { ascending: true });
+                .order("first_name", { ascending: true });
             if (error) {
                 throw new Error(error.message);
             }
@@ -74,14 +74,6 @@ const TodayWorkout = () => {
         sessionStorage.setItem('pinnedUsers', JSON.stringify(updatedPinnedUsers))
 
     }
-
-    /**
-     * Reloads the user list and updates the unpinned users if changes are detected.
-     * I create a reload button because we will work with session storage and we need to update the list of users.
-     */
-    const handleReloadUsers = async () => {
-        await fetchUsers();
-    };
 
     const handleSearchName = (e: React.ChangeEvent<HTMLInputElement>) => {
         const searchTerm = e.target.value.toLowerCase();
@@ -144,12 +136,6 @@ const TodayWorkout = () => {
                 <div className="flex flex-col">
                     <div className="flex flex-col-reverse justify-between items-center mb-4">
                         <h2 className="text-2xl font-bold mt-4">Usuarios Presentes</h2>
-                        <button className="bg-slate-400 p-2 rounded-lg hover:bg-slate-500" onClick={handleReloadUsers}>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                            </svg>
-                            Refrescar
-                        </button>
                     </div>
                     <div className="flex flex-wrap justify-center">
                         {pinnedUsers.length == 0 && (
