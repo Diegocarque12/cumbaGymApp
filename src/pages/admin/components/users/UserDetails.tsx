@@ -76,7 +76,7 @@ const UserDetails = () => {
                 .eq('id', user_id);
             if (error) console.error('Error deactivating user:', error);
             else {
-                navigate('/coach/users')
+                navigate('/admin/users')
             }
         }
     };
@@ -89,7 +89,7 @@ const UserDetails = () => {
                 .eq('id', user_id);
             if (error) console.error('Error deleting user:', error);
             else {
-                navigate('/coach/users')
+                navigate('/admin/users')
             }
         }
     };

@@ -30,7 +30,7 @@ const Nav = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center justify-between w-full">
             <Link
-              to='/admin/dashboard'
+              to='/coach/dashboard'
               className='flex items-center space-x-3 rtl:space-x-reverse'
             >
               <span className='self-center text-2xl font-semibold whitespace-nowrap'>
@@ -39,11 +39,11 @@ const Nav = () => {
             </Link>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
-                <NavLink to="/admin/dashboard" label="Inicio" />
-                <NavLink to="/admin/routines" label="Rutinas" />
-                <NavLink to="/admin/exercises" label="Ejercicios" />
-                <NavLink to="/admin/today-workout" label="Rutina de hoy" />
-                <NavLink to="/admin/users" label="Usuarios" />
+                <NavLink to="/coach/dashboard" label="Inicio" />
+                <NavLink to="/coach/routines" label="Rutinas" />
+                <NavLink to="/coach/exercises" label="Ejercicios" />
+                <NavLink to="/coach/today-workout" label="Rutina de hoy" />
+                <NavLink to="/coach/users" label="Usuarios" />
                 <button
                   onClick={handleLogout}
                   className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-700"
@@ -78,11 +78,11 @@ const Nav = () => {
         {isOpen && (
           <div className="md:hidden" id="mobile-menu">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              <MobileNavLink to="/admin/dashboard" label="Inicio" />
-              <MobileNavLink to="/admin/routines" label="Rutinas" />
-              <MobileNavLink to="/admin/exercises" label="Ejercicios" />
-              <MobileNavLink to="/admin/today-workout" label="Rutina de hoy" />
-              <MobileNavLink to="/admin/users" label="Usuarios" />
+              <MobileNavLink to="/coach/dashboard" label="Inicio" />
+              <MobileNavLink to="/coach/routines" label="Rutinas" />
+              <MobileNavLink to="/coach/exercises" label="Ejercicios" />
+              <MobileNavLink to="/coach/today-workout" label="Rutina de hoy" />
+              <MobileNavLink to="/coach/users" label="Usuarios" />
               <button
                 onClick={handleLogout}
                 className="w-full text-left px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700"

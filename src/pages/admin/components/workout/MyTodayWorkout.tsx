@@ -68,7 +68,7 @@ const MyTodayWorkout = ({ userId }: { userId: number }) => {
                 .insert(routineLog);
             if (error) throw error;
             console.log('Routine log saved successfully');
-            window.location.href = "/coach/workout-done";
+            window.location.href = "/admin/workout-done";
         } catch (error) {
             console.error('Error saving routine log:', error);
         }
@@ -236,8 +236,8 @@ const MyTodayWorkout = ({ userId }: { userId: number }) => {
             ))}
 
             <div>
-                <button onClick={() => { saveRoutineLog() }} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
-                    Terminar Rutina
+                <button disabled onClick={() => { saveRoutineLog() }} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
+                    ⚠️ Terminar Rutina
                 </button>
             </div>
         </>

@@ -27,9 +27,9 @@ const UserDashboard = () => {
                     return;
                 }
                 const { data: userData, error: userError } = await supabase
-                    .from("users")
+                    .from("profiles")
                     .select("*")
-                    .eq("user_id_auth", session.user.id)
+                    .eq("auth_id", session.user.id)
                     .single();
 
                 if (userError) {

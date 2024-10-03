@@ -9,8 +9,10 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-} from "@/components/ui/dialog"
+} from "../../../components/ui/dialog"
 import { Link } from "react-router-dom";
+import NewUserForm from "../components/users/NewUserForm";
+
 
 const Users = () => {
 	const [users, setUsers] = useState<User[]>([]);
@@ -19,7 +21,6 @@ const Users = () => {
 	const [userMeasurements, setUserMeasurements] = useState<UserMeasurement[]>([]);
 	const [searchTerm, setSearchTerm] = useState("");
 	const sortedUsers = [...users].sort((a, b) => a.first_name.localeCompare(b.first_name));
-
 
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -97,6 +98,23 @@ const Users = () => {
 		<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 container">
 			<div className="flex justify-between items-center my-8">
 				<h1 className="text-4xl font-bold text-gray-800">Usuarios</h1>
+				<Dialog>
+					<DialogTrigger>
+						<button
+							className="px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition duration-300 ease-in-out shadow-lg hidden lg:block"
+						>
+							Agregar Usuario
+						</button>
+					</DialogTrigger>
+					<DialogContent className="max-w-md overflow-y-auto max-h-screen">
+						<DialogHeader>
+							<DialogTitle className="text-2xl font-bold mb-6 text-center text-gray-800">Formulario De Registro</DialogTitle>
+							<DialogDescription>
+								<NewUserForm />
+							</DialogDescription>
+						</DialogHeader>
+					</DialogContent>
+				</Dialog>
 			</div >
 			<div className="bg-white rounded-xl shadow-lg p-6 mb-8">
 				<div className="mb-6">
@@ -132,6 +150,14 @@ const Users = () => {
 												<div className="bg-gradient-to-r from-blue-600 to-blue-900 rounded-xl shadow-2xl p-4 sm:p-8 text-white mb-8">
 													<div className="flex flex-col sm:flex-row items-center mb-6 justify-between">
 														<h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-0">{selectedUser?.first_name} {selectedUser?.last_name}</h2>
+														<div className="ml-auto">
+															<Link to={`/admin/users/${selectedUser?.id}/edit`} className="text-white font-semibold hover:text-blue-200 transition duration-300 ease-in-out">
+																<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
+																	<path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+																</svg>
+																Editar
+															</Link>
+														</div>
 													</div>
 													<div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
 														<div className="bg-white bg-opacity-20 rounded-lg p-4">
@@ -159,11 +185,17 @@ const Users = () => {
 												<div className="px-8">
 													<div className="flex justify-between items-center h-content mt-10 mb-6">
 														<h3 className="text-2xl font-bold text-gray-800">Rutinas</h3>
+														<Link to={`/admin/users/${selectedUser?.id}/routines`} className="text-gray-700 font-semibold hover:text-gray-900 transition duration-300 ease-in-out">
+															<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
+																<path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+															</svg>
+															Editar
+														</Link>
 													</div>
 													<div className="space-y-3 flex flex-col gap-2">
 														{userRoutines.length > 0 ? (
 															userRoutines.map((routine) => (
-																<Link className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out" to={`/coach/routines/${routine.id}`} key={routine.id}>{routine.name}</Link>
+																<Link className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out" to={`/admin/routines/${routine.id}`} key={routine.id}>{routine.name}</Link>
 															))
 														) : (
 															<p className="text-gray-600 italic">El usuario no tiene rutinas asignadas.</p>
@@ -173,6 +205,11 @@ const Users = () => {
 												<div className="px-8">
 													<div className="flex flex-col sm:flex-row justify-between items-center h-auto mt-10 mb-6">
 														<h3 className="text-2xl font-bold text-gray-800 mb-4 sm:mb-0">Últimas Medidas</h3>
+														<Link to={`/admin/users/${user.id}/measurements`}
+															className="px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition duration-300 ease-in-out shadow-lg"
+														>
+															Agregar Medida
+														</Link>
 													</div>
 													{userMeasurements.length > 0 ? (
 														<ul className="space-y-6">
@@ -219,6 +256,27 @@ const Users = () => {
 							</Dialog>
 						))}
 				</div>
+			</div>
+
+			<div className="fixed bottom-8 right-8">
+				<Dialog>
+					<DialogTrigger>
+						<button className="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition duration-300 ease-in-out shadow-lg block lg:hidden">
+							<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+							</svg>
+							Agregar Usuario
+						</button>
+					</DialogTrigger>
+					<DialogContent className="w-full max-w-md overflow-y-auto max-h-screen">
+						<DialogHeader>
+							<DialogTitle className="text-2xl font-bold mb-6 text-center text-gray-800">Formulario De Registro</DialogTitle>
+							<DialogDescription>
+								<NewUserForm />
+							</DialogDescription>
+						</DialogHeader>
+					</DialogContent>
+				</Dialog>
 			</div>
 		</div >
 	);
