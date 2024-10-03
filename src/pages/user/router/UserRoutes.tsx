@@ -2,8 +2,11 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Nav from "../../../ui/UserNav";
 import Dashboard from "../pages/Dashboard";
 import TodayWorkout from "../pages/TodayWorkout";
+import { useCheckRole } from "@/hooks/useCheckRole";
 
 const CouchRoutes = () => {
+    useCheckRole("user");
+
     return (
         <>
             <Nav />

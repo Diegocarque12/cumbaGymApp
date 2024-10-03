@@ -17,16 +17,23 @@ const LoginPage = () => {
         email,
         password,
       });
+      //TODO: Check if is necessary to save  the token in sessionStorage or localStorage
+      if (data.session?.access_token) {
+        sessionStorage.setItem('access_token', data.session.access_token);
+        if (rememberSession) {
+          localStorage.setItem('access_token', data.session.access_token);
+        }
+      }
       if (error) {
         throw new Error(error.message);
       }
       if (data.user) {
-        const { data: userWithRole } = await supabase.from("users").select("*").eq('user_id_auth', data.user.id).single();
+        const { data: userWithRole } = await supabase.from("profiles").select("*").eq('auth_id', data.user.id).single();
         if (userWithRole) {
           if (userWithRole.role === 'admin') {
-            navigate("/coach/dashboard");
+            navigate("/admin/dashboard");
           } else if (userWithRole.role === 'coach') {
-            navigate("/user/dashboard");
+            navigate("/coach/dashboard");
           } else {
             navigate("/user/dashboard");
           }
@@ -40,7 +47,6 @@ const LoginPage = () => {
       setError("Error al iniciar sesión. Por favor, verifica tus credenciales.");
     }
   };
-
 
   return (
     <>
@@ -92,6 +98,17 @@ const LoginPage = () => {
             </div>
 
             <button type="submit" className="w-full bg-accent text-accent-foreground p-3 rounded-lg hover:bg-accent/80 transition-colors duration-500 transform hover:scale-105 font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-accent focus:ring-opacity-50">Iniciar Sesión</button>          </form>
+
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-600">¿No tienes una cuenta?</p>
+            <button
+              onClick={() => { navigate("/signup") }}
+              className="mt-2 w-full bg-secondary text-secondary-foreground p-3 rounded-lg hover:bg-secondary/80 transition-colors duration-500 transform hover:scale-105 font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50"
+            >
+              Registrarse
+            </button>
+          </div>
+
         </div>
       </div>
     </>

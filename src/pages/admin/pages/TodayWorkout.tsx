@@ -23,7 +23,7 @@ const TodayWorkout = () => {
                 .from("profiles")
                 .select("*")
                 .is("deleted_at", null)
-                .order("name", { ascending: true });
+                .order("first_name", { ascending: true });
             if (error) {
                 throw new Error(error.message);
             }
@@ -138,6 +138,7 @@ const TodayWorkout = () => {
                 </div>
             </div>
             {currentScreen === "myWorkout" && (
+                //TODO: Apply the user Id
                 <MyTodayWorkout userId={1} />
             )}
             {currentScreen === "presentUsers" && (

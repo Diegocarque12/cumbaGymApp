@@ -1,20 +1,20 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import Routines from "../pages/Routines";
-import Nav from "../../../ui/CoachNav";
+import Nav from "../../../ui/AdminNav";
 import Routine from "../pages/RoutineDetails";
 import CreateRoutine from "../pages/CreateRoutine";
 import TodayWorkout from "../pages/TodayWorkout";
 import Exercises from "../pages/Exercises";
-import Users from "../pages/Users";
 import Dashboard from "../pages/Dashboard";
 import Measurement from "../pages/Measurement";
+import Users from "../pages/Users";
 import UserDetails from "../components/users/UserDetails";
 import WorkoutDone from "../pages/WorkoutDone";
 import UserRoutinesDetails from "../components/users/UserRoutinesDetails";
 import { useCheckRole } from "@/hooks/useCheckRole";
 
-const CouchRoutes = () => {
-  useCheckRole("coach");
+const AdminRoutes = () => {
+  useCheckRole("admin");
 
   return (
     <>
@@ -33,10 +33,10 @@ const CouchRoutes = () => {
         <Route path="/add-routine" element={<CreateRoutine />} />
         <Route path="/today-workout" element={<TodayWorkout />} />
         <Route path="/workout-done" element={<WorkoutDone />} />
-        <Route path="/" element={<Navigate to="coach/dashboard" replace />} />
+        <Route path="/" element={<Navigate to="admin/dashboard" replace />} />
       </Routes>
     </>
   );
 };
 
-export default CouchRoutes;
+export default AdminRoutes;

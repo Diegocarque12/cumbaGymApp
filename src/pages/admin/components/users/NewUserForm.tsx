@@ -1,5 +1,6 @@
 import supabase from "@/utils/supabaseClient";
 import { User } from "interfaces/types";
+import React from "react";
 import { useState } from "react";
 
 const NewUserForm = () => {

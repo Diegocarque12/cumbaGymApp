@@ -1,7 +1,7 @@
 export interface User {
   id?: number;
   national_id: string;
-  name: string;
+  first_name: string;
   last_name: string;
   age: number;
   goal?: string;
@@ -10,6 +10,7 @@ export interface User {
   is_active: boolean;
   deleted_at?: Date;
   role: "user" | "coach" | "admin";
+  created_by?: string;
 }
 
 export interface Routine {

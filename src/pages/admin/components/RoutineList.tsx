@@ -27,7 +27,7 @@ const RoutineList = () => {
     <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-12 text-center">
         <Link
-          to="/coach/add-routine"
+          to="/admin/add-routine"
           className="inline-block bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-lg font-semibold"
         >
           Crear Rutina
@@ -37,7 +37,7 @@ const RoutineList = () => {
         {sortedRoutines.map((routine) => (
           <Link
             key={routine.id}
-            to={`/coach/routines/${routine.id}`}
+            to={`/admin/routines/${routine.id}`}
             className="transform hover:scale-105 transition duration-300"
           >
             <Card name={routine.name} description={routine.description} />
