@@ -10,7 +10,7 @@ interface AssignRoutineDialogProps {
 
 interface User {
     id: number;
-    name: string;
+    first_name: string;
 }
 
 const AssignRoutineDialog = ({ routine_id }: AssignRoutineDialogProps) => {
@@ -40,7 +40,10 @@ const AssignRoutineDialog = ({ routine_id }: AssignRoutineDialogProps) => {
     useEffect(() => {
         const fetchUsers = async () => {
             const userlist = await fetchUsersWithoutRoutine();
-            setUsers(userlist);
+            setUsers(userlist.map(user => ({
+                id: user.id,
+                first_name: user.name
+            })));
         };
         fetchUsers();
     }, [])

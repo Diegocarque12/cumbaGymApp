@@ -1,4 +1,3 @@
-import React from "react";
 import RoutineList from "../components/RoutineList";
 
 const Routines = () => {
