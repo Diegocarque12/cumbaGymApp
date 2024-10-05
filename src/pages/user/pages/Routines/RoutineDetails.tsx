@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import supabase from "../../../utils/supabaseClient";
-import { Exercise, Routine, RoutineExercise, RoutineExerciseSet } from "../../../../interfaces/types";
 import { toast } from "react-toastify";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import ExerciseSetList from "../components/routine/ExerciseSetList";
+import supabase from "@/utils/supabaseClient";
+import ExerciseSetList from "@/pages/coach/components/routine/ExerciseSetList";
+import { Exercise, Routine, RoutineExercise, RoutineExerciseSet } from "interfaces/types";
 
 export default function RoutineDetails() {
   const { routine_id } = useParams<{ routine_id: string }>();
