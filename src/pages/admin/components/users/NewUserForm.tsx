@@ -70,13 +70,13 @@ const NewUserForm = () => {
                     />
                 </div>
                 <div>
-                    <label htmlFor="name" className="block text-gray-700 text-sm font-bold mb-2">
+                    <label htmlFor="first_name" className="block text-gray-700 text-sm font-bold mb-2">
                         Nombre:
                     </label>
                     <input
                         type="text"
-                        id="name"
-                        name="name"
+                        id="first_name"
+                        name="first_name"
                         value={newUser.first_name}
                         onChange={handleInputChange}
                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
