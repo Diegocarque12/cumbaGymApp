@@ -63,7 +63,7 @@ const Users = () => {
 	const fetchUserMeasurements = async (user_id: number) => {
 		try {
 			const { data, error } = await supabase
-				.from("user_measurements")
+				.from("profile_measurements")
 				.select("*")
 				.eq("user_id", user_id)
 				.order("measurement_date", { ascending: false })

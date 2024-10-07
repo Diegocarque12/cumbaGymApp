@@ -53,7 +53,7 @@ const Measurement = () => {
 			.order('measurement_date', { ascending: false });
 
 		if (error) {
-			console.error('Error fetching user_measurements:', error);
+			console.error('Error fetching profile_measurements:', error);
 		} else {
 			setMeasurements(data || []);
 		}
