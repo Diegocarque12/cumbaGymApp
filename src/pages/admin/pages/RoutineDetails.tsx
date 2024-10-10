@@ -240,8 +240,9 @@ export default function RoutineDetails() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between mb-6">
           <h1 className="text-3xl font-bold mb-8">Rutina de {routine?.name}</h1>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 border-b border-b-slate-400 pb-4 md:border-b-0 md:pb-0">
             <Button
+              className="w-auto"
               variant="outline"
               onClick={() => {
                 const newName = window.prompt("Ingrese el nuevo nombre para la rutina:", routine?.name)
@@ -250,13 +251,14 @@ export default function RoutineDetails() {
                 }
               }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
-              Editar
+              <span className="hidden md:block ml-2">Editar</span>
             </Button>
 
             <Button
+              className="w-auto"
               variant="destructive"
               onClick={() => {
                 if (window.confirm("¿Estás seguro de que quieres eliminar esta rutina? Se eliminara toda la información relacionada con esta rutina, menos los ejercicios.")) {
@@ -264,10 +266,10 @@ export default function RoutineDetails() {
                 }
               }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
-              Eliminar
+              <span className="hidden md:block ml-2">Eliminar</span>
             </Button>
           </div>
         </div>
@@ -275,7 +277,10 @@ export default function RoutineDetails() {
           <AssignRoutineDialog routine_id={currentRoutineId} />
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline">Crear Serie Nueva</Button>
+              <Button variant="default">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M440-280h80v-160h160v-80H520v-160h-80v160H280v80h160v160Zm40 200q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" /></svg>
+                <span className="ml-2 hidden md:block">Agregar serie</span>
+              </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -288,16 +293,27 @@ export default function RoutineDetails() {
             </DialogContent>
           </Dialog>
         </div>
-        <ExerciseSetList
-          routineExercises={routineExercise}
-          routineExerciseSets={routineExerciseSet}
-          exercises={exercises}
-          onUpdate={handleExerciseSetUpdate}
-          onDeleteSet={handleExerciseSetDeletion}
-          onDeleteExercise={handleExerciseDeletion}
-          onAdd={handleExerciseSetCreation}
-          routine_id={currentRoutineId}
-        />
+        {routineExercise.length > 0 &&
+          <ExerciseSetList
+            routineExercises={routineExercise}
+            routineExerciseSets={routineExerciseSet}
+            exercises={exercises}
+            onUpdate={handleExerciseSetUpdate}
+            onDeleteSet={handleExerciseSetDeletion}
+            onDeleteExercise={handleExerciseDeletion}
+            onAdd={handleExerciseSetCreation}
+            routine_id={currentRoutineId}
+          />
+        }
+        {routineExercise.length == 0 &&
+          <div className="flex flex-col items-center justify-center h-40 bg-gray-100 rounded-md">
+            <svg className="w-12 h-12 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+            <p className="text-gray-600 font-medium">No hay sets en esta rutina</p>
+            <p className="text-gray-400 text-sm mt-1">Agrega un nuevo set para comenzar</p>
+          </div>
+        }
         {/* {routineExercise.length > ITEMS_PER_PAGE && (
           <div className="mt-4 flex justify-center">
             <Button

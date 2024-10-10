@@ -1,8 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import Routines from "../pages/Routines";
 import Nav from "../../../ui/AdminNav";
-import Routine from "../pages/RoutineDetails";
-import CreateRoutine from "../pages/CreateRoutine";
+import RoutineDetails from "../pages/RoutineDetails";
 import TodayWorkout from "../pages/TodayWorkout";
 import Exercises from "../pages/Exercises";
 import Dashboard from "../pages/Dashboard";
@@ -29,8 +28,7 @@ const AdminRoutes = () => {
         <Route path="/users/:user_id/routines" element={<UserRoutinesDetails />} />
         <Route path="/users/:user_id/measurements" element={<Measurement />} />
         <Route path="/routines" element={<Routines />} />
-        <Route path="/routines/:routine_id" element={<Routine />} />
-        <Route path="/add-routine" element={<CreateRoutine />} />
+        <Route path="/routines/:routine_id" element={<RoutineDetails />} />
         <Route path="/today-workout" element={<TodayWorkout />} />
         <Route path="/workout-done" element={<WorkoutDone />} />
         <Route path="/" element={<Navigate to="admin/dashboard" replace />} />

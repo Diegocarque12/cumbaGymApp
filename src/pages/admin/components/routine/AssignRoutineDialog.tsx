@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useMutation, useQueryClient } from 'react-query';
 import supabase from '@/utils/supabaseClient';
-import { DialogDescription } from '@radix-ui/react-dialog';
 interface AssignRoutineDialogProps {
     routine_id: number;
 }
@@ -18,6 +17,7 @@ const AssignRoutineDialog = ({ routine_id }: AssignRoutineDialogProps) => {
     const [searchTerm, setSearchTerm] = useState<string>('');
     const queryClient = useQueryClient();
     const [users, setUsers] = useState<User[]>([]);
+    const [isOpen, setIsOpen] = useState(false)
 
     const fetchUsersWithoutRoutine = async () => {
         const { data: assignedUsers } = await supabase
@@ -25,14 +25,14 @@ const AssignRoutineDialog = ({ routine_id }: AssignRoutineDialogProps) => {
             .select('user_id')
             .eq('routine_id', routine_id);
 
-        const assignedUserIds = assignedUsers?.map(user => user.user_id) || [];
+        const assignedUserIds = assignedUsers?.map((user: { user_id: string }) => user.user_id) || [];
 
         const { data: availableUsers } = await supabase
             .from('profiles')
-            .select('id, name')
+            .select('id, first_name')
             .is('deleted_at', null)
             .not('id', 'in', `(${assignedUserIds.join(',')})`)
-            .order('name');
+            .order('first_name');
 
         return availableUsers || [];
     };
@@ -40,9 +40,9 @@ const AssignRoutineDialog = ({ routine_id }: AssignRoutineDialogProps) => {
     useEffect(() => {
         const fetchUsers = async () => {
             const userlist = await fetchUsersWithoutRoutine();
-            setUsers(userlist.map(user => ({
+            setUsers(userlist.map((user: { id: number; first_name: string }) => ({
                 id: user.id,
-                first_name: user.name
+                first_name: user.first_name
             })));
         };
         fetchUsers();
@@ -74,7 +74,7 @@ const AssignRoutineDialog = ({ routine_id }: AssignRoutineDialogProps) => {
     };
 
     return (
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
                 <Button>Asignar</Button>
             </DialogTrigger>

@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import ExerciseSetForm from './ExerciseSetForm';
 import { Exercise, RoutineExercise, RoutineExerciseSet, WeightTypes } from "interfaces/types";
 import { GetCompleteWeightType } from '@/utils/WeightType';
 import supabase from '@/utils/supabaseClient';
+import ExerciseSetListTable from './ExerciseSetListTable';
+import ExerciseSetListCard from './ExerciseSetListCard';
 
 interface ExerciseSetListProps {
     routineExercises: RoutineExercise[];
@@ -32,13 +33,15 @@ const ExerciseSetList = ({
     const [isWeightTypeDialogOpen, setIsWeightTypeDialogOpen] = useState(false);
     const [refreshPage, setRefreshPage] = useState(false);
 
+    const memoizedOnAdd = useCallback((routineExerciseId: number) => {
+        onAdd(routineExerciseId);
+    }, [onAdd]);
+
     const onUpdateWeightType = async (routineExerciseId: number, newWeightTypeId: number) => {
         setWeightType({
             id: newWeightTypeId,
             name: GetCompleteWeightType(newWeightTypeId),
         });
-        console.log(newWeightTypeId, routineExerciseId);
-
         const { error } = await supabase.from('routine_exercises').update({ weight_type_id: newWeightTypeId }).eq('routine_id', routineExerciseId);
         if (error) {
             console.error('Error updating weight type:', error);
@@ -74,7 +77,12 @@ const ExerciseSetList = ({
                                 )}
                                 <Dialog open={isWeightTypeDialogOpen} onOpenChange={setIsWeightTypeDialogOpen}>
                                     <DialogTrigger asChild>
-                                        <Button variant="secondary" className="mr-2 bg-blue-600 text-white hover:bg-blue-700">Cambiar Tipo de Peso</Button>
+                                        <Button variant="secondary" className="mr-2 bg-blue-600 text-white hover:bg-blue-700">
+                                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+                                                <path d="m536-84-56-56 142-142-340-340-142 142-56-56 56-58-56-56 84-84-56-58 56-56 58 56 84-84 56 56 58-56 56 56-142 142 340 340 142-142 56 56-56 58 56 56-84 84 56 58-56 56-58-56-84 84-56-56-58 56Z" />
+                                            </svg>
+                                            <span className='hidden md:block ml-2'>Cambiar Tipo de Peso</span>
+                                        </Button>
                                     </DialogTrigger>
                                     <DialogContent>
                                         <DialogHeader>
@@ -111,78 +119,17 @@ const ExerciseSetList = ({
                                         </div>
                                     </DialogContent>
                                 </Dialog>
-                                <button className='bg-red-500 p-4 text-white rounded-lg' onClick={() => onDeleteExercise(routineExercise.id)}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                        <line x1="10" y1="11" x2="10" y2="17"></line>
-                                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                                <button className='bg-red-500 p-2 text-white rounded-lg' onClick={() => onDeleteExercise(routineExercise.id)}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed">
+                                        <path d="m336-280 144-144 144 144 56-56-144-144 144-144-56-56-144 144-144-144-56 56 144 144-144 144 56 56ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
                                     </svg>
                                 </button>
                             </div>
-
                         </div>
-                        <table className="w-full border-collapse">
-                            <thead>
-                                <tr className="bg-gray-100">
-                                    <th className="border p-2 text-left">Set</th>
-                                    <th className="border p-2 text-left">Peso sugerido</th>
-                                    <th className="border p-2 text-left">Repeticiones sugeridas</th>
-                                    <th className="border p-2 text-left">Tipo de peso</th>
-                                    <th className="border p-2 text-left">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {sortedSets.map((set) => (
-                                    <tr key={set.id} className="hover:bg-gray-50">
-                                        <td className="border p-2">{set.set_number}</td>
-                                        <td className="border p-2">{set.suggested_weight}</td>
-                                        <td className="border p-2">{set.suggested_repetitions}</td>
-                                        <td className="border p-2">{GetCompleteWeightType(routineExercise.weight_type_id)}</td>
-                                        <td className="border p-2">
-                                            <Dialog open={(editingSet?.id === set.id) || (isAddingNew && !set.id)}
-                                                onOpenChange={(open) => {
-                                                    if (!open) {
-                                                        setEditingSet(null);
-                                                        setIsAddingNew(false);
-                                                    }
-                                                }}
-                                            >
-                                                <DialogTrigger asChild>
-                                                    <Button variant="outline" className="mr-2" onClick={() => { setEditingSet(set) }}>Editar</Button>
-                                                </DialogTrigger>
-                                                <DialogContent>
-                                                    <DialogHeader>
-                                                        <DialogTitle>Editar el set de ejercicio</DialogTitle>
-                                                    </DialogHeader>
-                                                    {editingSet && (
-                                                        <ExerciseSetForm
-                                                            onSubmit={(updatedSet: Omit<RoutineExerciseSet, "id">) => {
-                                                                onUpdate({ ...updatedSet, id: set.id, routine_exercise_id: set.routine_exercise_id, set_number: set.set_number } as RoutineExerciseSet);
-                                                                setEditingSet(null);
-                                                            }}
-                                                            initialValues={editingSet}
-                                                        />
-                                                    )}
-                                                </DialogContent>
-                                            </Dialog>
-                                            <Button variant="destructive" onClick={() => {
-                                                if (set.id) {
-                                                    onDeleteSet(set.id)
-                                                }
-                                            }}>Eliminar</Button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                <tr>
-                                    <td colSpan={5}>
-                                        <Button className="w-full" onClick={() => onAdd(routineExercise.id)}>
-                                            Agregar Set
-                                        </Button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <ExerciseSetListTable sortedSets={sortedSets} editingSet={editingSet} setEditingSet={setEditingSet} isAddingNew={isAddingNew} setIsAddingNew={setIsAddingNew} weightTypeId={routineExercise.weight_type_id} routineExerciseId={routineExercise.id} onUpdate={onUpdate} onDeleteSet={onDeleteSet} onAdd={memoizedOnAdd} />
+                        {/* TODO: Check why add many sets on only one click
+                         */}
+                        <ExerciseSetListCard sortedSets={sortedSets} editingSet={editingSet} setEditingSet={setEditingSet} isAddingNew={isAddingNew} setIsAddingNew={setIsAddingNew} weightTypeId={routineExercise.weight_type_id} routineExerciseId={routineExercise.id} onUpdate={onUpdate} onDeleteSet={onDeleteSet} onAdd={memoizedOnAdd} />
                     </div>
                 );
             })}
